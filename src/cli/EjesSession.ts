@@ -224,7 +224,10 @@ export class EjesSession extends Session {
             }
             // if (find[index].length > 0) {
             if (acceptLine(resp, index)) {
-                result += (info.blockId + " " + resp.lines[index] + "\n");
+                if (this.params.arguments.debug) {
+                    result += (info.blockId + " ");
+                }
+                result += (resp.lines[index] + "\n");
             }
         });
         if ( result ) { this.params.response.console.log(result.substr(0, result.length - 1)); }

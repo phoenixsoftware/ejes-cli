@@ -20,20 +20,21 @@ export default class ListHandler implements ICommandHandler {
 
     public async process(params: IHandlerParameters): Promise<void> {
 
-        let findInProgress = false;
+//        let findInProgress = false;
         let acceptLine = (resp: IEjes, index: number) => true;
         let cmdPrimary = "log";
         let cmdAlternate = "";
         let findCount = 0;
 
         if (params.arguments.find !== undefined) {
-            findInProgress = true;
+//            findInProgress = true;
             acceptLine = (resp: IEjes, index: number): boolean => {
-                if ( resp.find[index].length > 0 ) {
-                    findCount += 1;
-                    return true;
-                }
-                else { return false; }
+//                if ( resp.find[index].length > 0 ) {
+//                    findCount += 1;
+//                    return true;
+//                }
+//                else { return false; }
+                return resp.find[index].length > 0;
             };
 
             cmdPrimary += ";find \"" + params.arguments.find + "\"";
@@ -83,7 +84,7 @@ export default class ListHandler implements ICommandHandler {
         params.response.data.setObj(response);
         debugResponse("2000", response);
 
-        const fetchDataWithFind = async (): Promise<void> => {
+        const fetchDataWithFindDoNotUse = async (): Promise<void> => {
 
             debugResponse("2000", response);
 
@@ -118,6 +119,16 @@ export default class ListHandler implements ICommandHandler {
             }
         };
 
+        const fetchDataWithFind = async (): Promise<void> => {
+            while ( response.returnCode <= maxAcceptableReturnCode ) {
+                if (response.returnCode === maxAcceptableReturnCode && response.reasonCode === 0 ) { return; }
+                session.showlog(response, acceptLine);
+                if (response.returnCode === 0 && response.reasonCode === 1 ) { return; }
+                response = await Ejes.exec(session, { enumValue: `${params.arguments.enumValue}`, command: "LOCATE BLK=" + session.block });
+                params.response.data.setObj(response);
+            }
+        };
+
         const fetchData = async (): Promise<void> => {
             while ( response.returnCode <= maxAcceptableReturnCode ) {
                 if (response.returnCode === maxAcceptableReturnCode && response.reasonCode === 0 ) { return; }
@@ -130,13 +141,15 @@ export default class ListHandler implements ICommandHandler {
 
         if (params.arguments.find) {
             if (params.arguments.nonstop) {
-                const xyzzy = async (): Promise<void> => {
-                    debugResponse("6000", response);
-                    await fetchDataWithFind();
-                    debugResponse("8000", response);
-                    setTimeout(xyzzy, params.arguments.timerInterval );
-                };
-                xyzzy();
+//                const xyzzy = async (): Promise<void> => {
+//                    debugResponse("6000", response);
+//                    await fetchDataWithFind();
+//                    debugResponse("8000", response);
+//                    setTimeout(xyzzy, params.arguments.timerInterval );
+//                };
+//                xyzzy();
+                const timer = setInterval( () => { fetchDataWithFind(); response.returnCode = response.reasonCode = 0; },
+                        params.arguments.timerInterval );
             }
             else {
                 fetchDataWithFind();

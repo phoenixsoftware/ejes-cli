@@ -10,7 +10,7 @@
 */
 
 import { IEjes } from "./doc/IEjes";
-import { RestClient, Session, ImperativeExpect, Logger, Imperative, TextUtils } from "@brightside/imperative";
+import { RestClient, Session, ImperativeExpect, Logger, Imperative, TextUtils } from "@zowe/imperative";
 
 export class Ejes {
 

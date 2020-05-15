@@ -1,4 +1,4 @@
- {
+{
   "name": "@zowe/ejes",
   "version": "2.0.2",
   "description": "A sample plugin for Zowe CLI :)",
@@ -26,12 +26,12 @@
   "imperative": {
     "configurationModule": "lib/imperative.js"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@zowe/cli": "^6.0.0",
     "@zowe/imperative": "^4.0.0"
   },
   "devDependencies": {
-    "@zowe/cli": "^6.13.0",
+    "@zowe/cli": "6.13.0",
     "@zowe/imperative": "^4.6.2",
     "@types/jest": "^20.0.5",
     "@types/node": "^8.10.59",

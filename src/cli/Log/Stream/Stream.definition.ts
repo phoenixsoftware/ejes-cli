@@ -10,7 +10,7 @@
 */
 
 import * as path from "path";
-import { ICommandDefinition } from "@brightside/imperative";
+import { ICommandDefinition } from "@zowe/imperative";
 
 
 const FIND_OPTIONS = "Find options";

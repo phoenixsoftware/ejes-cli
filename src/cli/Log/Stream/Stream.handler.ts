@@ -9,9 +9,9 @@
 *
 */
 
-//  node --inspect-brk C:\Users\vssemc\AppData\Roaming\npm\node_modules\@brightside\core\lib\main.js
+//  node --inspect-brk C:\Users\vssemc\AppData\Roaming\npm\node_modules\@zowe\core\lib\main.js
 
-import { ICommandHandler, IHandlerParameters } from "@brightside/imperative";
+import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
 import { IEjes } from "../../../api/doc/IEjes";
 import { Ejes } from "../../../api/Ejes";
 import { EjesSession } from "../../EjesSession";

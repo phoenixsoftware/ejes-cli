@@ -9,7 +9,7 @@
 *
 */
 
-import { ICommandDefinition } from "@brightside/imperative";
+import { ICommandDefinition } from "@zowe/imperative";
 import { StreamDefinition } from "./Stream/Stream.definition";
 import { EjesSession } from "../EjesSession";
 

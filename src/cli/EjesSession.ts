@@ -10,7 +10,7 @@
 */
 
 import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
-    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@brightside/imperative";
+    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
 import { IEjes } from "../api/Doc/IEjes";
 
 /**

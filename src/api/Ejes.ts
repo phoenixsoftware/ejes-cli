@@ -9,7 +9,7 @@
 *
 */
 
-import { IEjes } from "./doc/IEjes";
+import { IEjes } from "./Doc/IEjes";
 import { RestClient, Session, ImperativeExpect, Logger, Imperative, TextUtils } from "@zowe/imperative";
 
 export class Ejes {

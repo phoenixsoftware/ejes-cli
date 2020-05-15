@@ -12,7 +12,7 @@
 //  node --inspect-brk C:\Users\vssemc\AppData\Roaming\npm\node_modules\@zowe\core\lib\main.js
 
 import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
-import { IEjes } from "../../../api/doc/IEjes";
+import { IEjes } from "../../../api/Doc/IEjes";
 import { Ejes } from "../../../api/Ejes";
 import { EjesSession } from "../../EjesSession";
 

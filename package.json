@@ -1,6 +1,6 @@
 {
-  "name": "@zowe/ejes",
-  "version": "2.0.2",
+  "name": "@tulsagrammer/ejes-cli",
+  "version": "1.0.0",
   "description": "A sample plugin for Zowe CLI :)",
   "repository": {
     "type": "git",

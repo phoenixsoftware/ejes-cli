@@ -18,7 +18,7 @@ The CLI is available as an NPM module. To Install:
 
 1. Enter the command `npm install -g @phoenixsoftware/ejes-cli` to add the CLI to your computer's global NPM repository.
 
-2. Enter the command `zowe plugins install @tulsagrammer/ejes-cli` to install the (E)JES plug-in into your local copy of the Zowe CLI base.
+2. Enter the command `zowe plugins install @phoenixsoftware/ejes-cli` to install the (E)JES plug-in into your local copy of the Zowe CLI base.
 
 3. Optionally, enter the command `zowe plugins install @zowe/secure-credential-store-for-zowe-cli@zowe-v1-lts` to install Zowe's Secure Credential Store. This will allow logon credentials contained in CLI profiles to be stored in a secure, encrypted format.
 

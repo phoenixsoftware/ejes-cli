@@ -214,6 +214,12 @@ export class EjesSession extends Session {
         this.logger.log(msg);
     }
 
+    public debugLog(msg: string) {
+        if (this.params.arguments.debug) {
+            this.log(msg);
+        }
+    }
+
     public showlog( resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
         let found = this.block ? false : true;
         let result = "";
@@ -236,26 +242,26 @@ export class EjesSession extends Session {
     }
 
     public storeCookie(cookie: any) {
-        this.log("*** DEBUG ***  storeCookie has been invoked.");
-        this.log("*** DEBUG ***  ISession.tokenType: " + this.ISession.tokenType);
+        this.debugLog("*** DEBUG ***  storeCookie has been invoked.");
+        this.debugLog("*** DEBUG ***  ISession.tokenType: " + this.ISession.tokenType);
 
         const headerKeys: string[] = Object.keys(cookie);
         headerKeys.forEach((key) => {
             const auth = cookie[key] as string;
             const authArr = auth.split(";");
-            this.log("*** DEBUG ***  key: " + key + ", auth: " + auth);
+            this.debugLog("*** DEBUG ***  key: " + key + ", auth: " + auth);
             // see each field in the cookie, e/g. Path=/; Secure; HttpOnly; LtpaToken2=...
             authArr.forEach((element: string) => {
-                this.log("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
+                this.debugLog("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
                 // if we match requested token type, save it off for its length
                 if (element.indexOf(this.ISession.tokenType) === 0) {
                     // parse off token value, minus LtpaToken2= (as an example)
                     const ejesCookie: string[] = element.split("=");
-                    this.log("*** DEBUG ***  token: " + ejesCookie[0] + ", value: " + ejesCookie[1]);
+                    this.debugLog("*** DEBUG ***  token: " + ejesCookie[0] + ", value: " + ejesCookie[1]);
                     this.ISession.tokenType  = ejesCookie[0];
                     this.ISession.tokenValue = ejesCookie[1];
                     // this.ISession.tokenValue = element.substr(this.ISession.tokenType.length + 1, element.length);
-                    this.log("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
+                    this.debugLog("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
                 }
             });
         });

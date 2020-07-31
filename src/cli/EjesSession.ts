@@ -256,12 +256,15 @@ export class EjesSession extends Session {
                 // if we match requested token type, save it off for its length
                 if (element.indexOf(this.ISession.tokenType) === 0) {
                     // parse off token value, minus LtpaToken2= (as an example)
-                    const ejesCookie: string[] = element.split("=");
-                    this.debugLog("*** DEBUG ***  token: " + ejesCookie[0] + ", value: " + ejesCookie[1]);
-                    this.ISession.tokenType  = ejesCookie[0];
-                    this.ISession.tokenValue = ejesCookie[1];
-                    // this.ISession.tokenValue = element.substr(this.ISession.tokenType.length + 1, element.length);
-                    this.debugLog("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
+                    const split = element.indexOf("=");
+                    if (split >= 0) {
+                        this.ISession.tokenType  = element.substring(0, split);
+                        this.ISession.tokenValue = element.substring(split + 1);
+                    }
+                    else {
+                        this.ISession.tokenValue = "";
+                    }
+                    this.debugLog("*** DEBUG ***  tokenType: " + this.ISession.tokenType + ", tokenValue: " + this.ISession.tokenValue);
                 }
             });
         });

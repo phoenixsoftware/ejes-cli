@@ -15,14 +15,31 @@ import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
 import { IEjes } from "../../../api/Doc/IEjes";
 import { Ejes } from "../../../api/Ejes";
 import { EjesSession } from "../../EjesSession";
+import * as util from "util";
 
 export default class ListHandler implements ICommandHandler {
 
+    private session: EjesSession;
+    private params: IHandlerParameters;
+    private maxDepth = 10;
+
     public async process(params: IHandlerParameters): Promise<void> {
 
+        this.params = params;
+        this.session = EjesSession.EjesSessionFactory(this.params);
+
+        const errorOnTerm150 = 150;
+        const errorOnExec151 = 151;
+        const errorOnInit152 = 152;
+        const maxAcceptableReturnCode = 4;
+        const stringNotFoundReturnCode = 8;
         let acceptLine = (resp: IEjes, index: number) => true;
         let cmdPrimary = "log";
         let cmdAlternate = "";
+        let response: IEjes;
+        let signal = false;
+        let terminated = false;
+        let timer: any;
 
         if (params.arguments.find !== undefined) {
             acceptLine = (resp: IEjes, index: number): boolean => {
@@ -43,54 +60,88 @@ export default class ListHandler implements ICommandHandler {
             cmdAlternate = "find \"" + params.arguments.find + "\" next";
         }
 
-        const maxAcceptableReturnCode = 4;
-        const stringNotFoundReturnCode = 8;
-        let signal = false;
-        let terminated = false;
-
-        const session = EjesSession.EjesSessionFactory(params);
-
-        process.on("SIGPIPE", () => { params.response.console.log("Broken Pipe"); signal = true; terminated = true; logoff(); });
+        process.on("SIGPIPE", () => { params.response.console.log("Broken Pipe"); logoff(); });
         process.on("SIGHUP", () => { params.response.console.log("Hangup"); logoff(); });
         process.on("SIGINT", () => { params.response.console.log(""); params.response.console.log("Interrupt"); logoff(); });
-        process.on("exit", (code) => { params.response.console.log("Done"); });
-
-        const debugResponse = (tag: string, resp: IEjes) => {
-            if (params.arguments.debug) {
-                session.log(`*** DEBUG ${tag} ***  returnCode: ${resp.returnCode}, `
-                    + `reasonCode: ${resp.reasonCode}, block: ${session.block}, `
-                    + `position: ${resp.position.logInfo.blockId}, `
-                    + `lines: ${resp.lines.length},  `
-                    + `message: "${response.message.shortMessage}"`);
+        process.on("exit", (code) => {
+            if ( ! signal ) {
+                logoff();
             }
-        };
+            params.response.console.log("Done");
+        });
 
         const logoff = async (): Promise<void> => {
-            const resp = await Ejes.term(session);
-            params.response.data.setObj(resp);
-            process.exit(-1);
+            clearInterval(timer);
+            signal = true;
+            try {
+                this.debugMsg("logoff", "Sending request.  RESTAPI may not respond before exiting.");
+                const resp = await Ejes.term(this.session);
+                terminated = true;
+                this.debugResponse("logoff", resp);
+            }
+            catch (e) {
+                this.session.log(util.inspect(e, true, this.maxDepth, true));
+                params.response.data.setExitCode(errorOnTerm150);
+                process.exitCode = errorOnTerm150;
+            }
         };
 
         const fetchData = async (): Promise<void> => {
             while ( response.returnCode <= maxAcceptableReturnCode ) {
+                if ( signal ) {
+                    return; // Don't send new request if we tried to logoff.
+                }
                 if (response.returnCode === maxAcceptableReturnCode && response.reasonCode === 0 ) { return; }
-                session.showlog(response, acceptLine);
+                this.session.showlog(response, acceptLine);
                 if (response.returnCode === 0 && response.reasonCode === 1 ) { return; }
-                response = await Ejes.exec(session, { enumValue: `${params.arguments.enumValue}`, command: "LOCATE BLK=" + session.block });
+                try {
+                    response = await Ejes.exec(
+                            this.session,
+                            { enumValue: `${params.arguments.enumValue}`, command: "LOCATE BLK=" + this.session.block });
+                }
+                catch (e) {
+                    if ( ! signal ) {
+                        this.session.log(util.inspect(e, true, this.maxDepth, true));
+                        signal = true; // Terminate will likely generate the same error, so skip further requests.
+                    }
+                    params.response.data.setExitCode(errorOnExec151);
+                    return process.exit(errorOnExec151); // The on.exit will send a logoff.
+                }
                 params.response.data.setObj(response);
             }
         };
 
-        let response = await Ejes.init(session, { columns: session.columns, rows: session.rows },
-                { enumValue: session.dataLines, command: cmdPrimary });
+        try {
+            response = await Ejes.init(this.session, { columns: this.session.columns, rows: this.session.rows },
+                { enumValue: this.session.dataLines, command: cmdPrimary });
+        }
+        catch (e) {
+            if ( ! signal ) {
+                this.session.log(util.inspect(e, true, this.maxDepth, true));
+                signal = true; // Terminate will likely generate the same error, so skip further requests.
+            }
+            params.response.data.setExitCode(errorOnInit152);
+            return process.exit(errorOnInit152);  // The on.exit will send a logoff.
+        }
         params.response.data.setObj(response);
+        this.debugResponse("init", response);
 
-        if (params.arguments.nonstop) {
-            const timer = setInterval( () => { fetchData(); response.returnCode = response.reasonCode = 0; },
+        if (params.arguments.nonstop && ! params.arguments.rfj ) {
+            timer = setInterval( () => { fetchData(); response.returnCode = response.reasonCode = 0; },
                     params.arguments.timerInterval );
         }
         else {
             fetchData();
         }
+    }
+
+    private debugMsg(tag: string, msg: string) {
+        if (this.params.arguments.debug) {
+            this.session.log(`*** DEBUG ${tag} ***  ${msg}`);
+        }
+    }
+
+    private debugResponse(tag: string, resp: IEjes): void {
+        this.debugMsg(tag, "response: " + util.inspect(resp, true, this.maxDepth, true));
     }
 }

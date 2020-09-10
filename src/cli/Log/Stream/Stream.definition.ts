@@ -24,7 +24,7 @@ export const StreamDefinition: ICommandDefinition = {
     options: [
               {
                   name: "nonstop",
-                  description: "When EOF reached on stream, wait for more data.",
+                  description: "When EOF reached on stream, wait for more data.  Ignored for --response-format-json.",
                   type: "boolean"
               },
               {

@@ -9,8 +9,10 @@
 *
 */
 
-import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
-    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
+import {
+    ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
+    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi
+} from "@zowe/imperative";
 import { IEjes } from "../api/Doc/IEjes";
 
 /**
@@ -20,7 +22,7 @@ import { IEjes } from "../api/Doc/IEjes";
 export class EjesSession extends Session {
 
     public static EJES_CONNECTION_OPTION_GROUP = "EJES Connection Options";
-    public static EJES_RUNTIME_OPTION_GROUP    = "EJES CLI Runtime Options";
+    public static EJES_RUNTIME_OPTION_GROUP = "EJES CLI Runtime Options";
 
     /**
      * Option used in profile creation and commands for protocol for (E)JES
@@ -32,7 +34,7 @@ export class EjesSession extends Session {
         type: "string",
         defaultValue: "https",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP,
-        allowableValues: { values: [ "http", "https" ], caseSensitive: false },
+        allowableValues: { values: ["http", "https"], caseSensitive: false },
     };
 
     /**
@@ -120,22 +122,22 @@ export class EjesSession extends Session {
     };
 
     public static EJES_OPTION_ENUMERATION_VALUE: ICommandOptionDefinition = {
-            name: "enum-value",
-            aliases: ["enumval", "ev"],
-            description: "Number of lines to retreieve per (E)JES API call.",
-            type: "number",
-            defaultValue: 200,
-            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-        };
+        name: "enum-value",
+        aliases: ["enumval", "ev"],
+        description: "Number of lines to retreieve per (E)JES API call.",
+        type: "number",
+        defaultValue: 200,
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
 
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
-            name: "debug",
-            aliases: ["dbg"],
-            description: "Invoke debugging code.",
-            type: "boolean",
-            defaultValue: false,
-            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-        };
+        name: "debug",
+        aliases: ["dbg"],
+        description: "Invoke debugging code.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
 
     /**
      * Options related to the (E)JES CLI
@@ -220,12 +222,12 @@ export class EjesSession extends Session {
         }
     }
 
-    public showlog( resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
+    public showlog(resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
         let found = this.block ? false : true;
         let result = "";
         resp.loginfo.forEach((info, index) => {
-            if ( ! found ) {
-                found = ( info.blockId === this.block && info.recordId === this.record );
+            if (!found) {
+                found = (info.blockId === this.block && info.recordId === this.record);
                 return;
             }
             // if (find[index].length > 0) {
@@ -236,7 +238,7 @@ export class EjesSession extends Session {
                 result += (resp.lines[index] + "\n");
             }
         });
-        if ( result ) { this.params.response.console.log(result.substr(0, result.length - 1)); }
+        if (result) { this.params.response.console.log(result.substr(0, result.length - 1)); }
         this.block = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].blockId : "";
         this.record = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].recordId : 0;
     }
@@ -258,7 +260,7 @@ export class EjesSession extends Session {
                     // parse off token value, minus LtpaToken2= (as an example)
                     const split = element.indexOf("=");
                     if (split >= 0) {
-                        this.ISession.tokenType  = element.substring(0, split);
+                        this.ISession.tokenType = element.substring(0, split);
                         this.ISession.tokenValue = element.substring(split + 1);
                     }
                     else {

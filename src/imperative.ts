@@ -14,6 +14,7 @@ import { EjesSession } from "./cli/EjesSession";
 
 const config: IImperativeConfig = {
     commandModuleGlobs: ["**/cli/*/*.definition!(.d).*s"],
+    pluginHealthCheck: __dirname + "/healthCheck.Handler",
     pluginSummary: "Zowe CLI (E)JES plug-in",
     pluginAliases: ["ej"],
     rootCommandDescription: "Welcome to the (E)JES plug-in for Zowe CLI!\n\n The (E)JES plug-in " +

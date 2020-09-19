@@ -42,7 +42,7 @@ Summarizing specifically for the (E)JES plug-in:
 
 1. cd to the "ejes-cli" folder created in the previous section.
 
-4. Run the command `npm run installPlugin`. This command will perform a number of separate build steps "under the covers" by invoking the commands:
+4. Run the command `npm run install-plugin`. This command will perform a number of separate build steps "under the covers" by invoking the commands:
 
     * `npm install` to download any additional node.js modules required to complete the build process.
 

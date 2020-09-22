@@ -5,7 +5,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright Contributors to the Zowe Project.
+* Copyright (c) 2020 Phoenix Software International, Inc.
 */
 
 export interface ILogInfo {

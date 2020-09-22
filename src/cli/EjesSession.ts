@@ -6,13 +6,10 @@
 * SPDX-License-Identifier: EPL-2.0
 *
 * Copyright Contributors to the Zowe Project.
-*
 */
 
-import {
-    ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
-    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi
-} from "@zowe/imperative";
+import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
+    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
 import { IEjes } from "../api/Doc/IEjes";
 
 /**
@@ -22,7 +19,7 @@ import { IEjes } from "../api/Doc/IEjes";
 export class EjesSession extends Session {
 
     public static EJES_CONNECTION_OPTION_GROUP = "EJES Connection Options";
-    public static EJES_RUNTIME_OPTION_GROUP = "EJES CLI Runtime Options";
+    public static EJES_RUNTIME_OPTION_GROUP    = "EJES CLI Runtime Options";
 
     /**
      * Option used in profile creation and commands for protocol for (E)JES
@@ -34,7 +31,7 @@ export class EjesSession extends Session {
         type: "string",
         defaultValue: "https",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP,
-        allowableValues: { values: ["http", "https"], caseSensitive: false },
+        allowableValues: { values: [ "http", "https" ], caseSensitive: false },
     };
 
     /**
@@ -66,8 +63,8 @@ export class EjesSession extends Session {
      */
     public static EJES_OPTION_USER: ICommandOptionDefinition = {
         name: "user",
-        aliases: ["u"],
-        description: "Mainframe ((E)JES) user name, which can be the same as your TSO login.",
+        aliases: ["U"],
+        description: "Mainframe (E)JES user name, which can be the same as your TSO login.",
         type: "string",
         required: true,
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP
@@ -79,7 +76,7 @@ export class EjesSession extends Session {
     public static EJES_OPTION_PASSWORD: ICommandOptionDefinition = {
         name: "password",
         aliases: ["pass", "pw"],
-        description: "Mainframe ((E)JES) password, which can be the same as your TSO password.",
+        description: "Mainframe (E)JES password, which can be the same as your TSO password.",
         type: "string",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP,
         required: true
@@ -90,7 +87,7 @@ export class EjesSession extends Session {
      */
     public static EJES_OPTION_REJECT_UNAUTHORIZED: ICommandOptionDefinition = {
         name: "reject-unauthorized",
-        aliases: ["ru"],
+        aliases: ["rejectunauthorized", "ru"],
         description: "Reject self-signed certificates.",
         type: "boolean",
         defaultValue: true,
@@ -112,6 +109,30 @@ export class EjesSession extends Session {
     /**
      * Option used in profile creation and commands for CLI run-time configuration.
      */
+    public static EJES_OPTION_COLOR_SCHEME: ICommandOptionDefinition = {
+        name: "color-scheme",
+        aliases: ["scheme", "cs"],
+        description: "Accessibility option: Specify the name of a color scheme.  User scheme files may also be created and specified to provide better contrast or to favor easier to see colors.  For a how-to, use \"zowe ejes emulate batch --helpApp scheme-info\"\n\nAllowed values: dark, light, powershell, nono, none, user-scheme-file, list, help",
+        type: "string",
+        defaultValue: "dark",
+        group: EjesSession.EJES_CONNECTION_OPTION_GROUP
+    };
+
+    /**
+     * Option used in profile creation and commands for CLI run-time configuration.
+     */
+    public static EJES_OPTION_NO_COLOR: ICommandOptionDefinition = {
+        name: "no-color",
+        aliases: ["noColor", "nc"],
+        description: "Accessibility option: Specify to prevent colorization of the CLI.  Same effect as defining NO_COLOR or FORCE_COLOR=0.",
+        type: "string",
+//        defaultValue: "off",
+        group: EjesSession.EJES_CONNECTION_OPTION_GROUP
+    };
+
+    /**
+     * Option used in profile creation and commands for CLI run-time configuration.
+     */
     public static EJES_OPTION_TIMER_INTERVAL: ICommandOptionDefinition = {
         name: "timer-interval",
         aliases: ["timeint", "ti"],
@@ -122,22 +143,22 @@ export class EjesSession extends Session {
     };
 
     public static EJES_OPTION_ENUMERATION_VALUE: ICommandOptionDefinition = {
-        name: "enum-value",
-        aliases: ["enumval", "ev"],
-        description: "Number of lines to retreieve per (E)JES API call.",
-        type: "number",
-        defaultValue: 200,
-        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-    };
+            name: "enum-value",
+            aliases: ["enumval", "ev"],
+            description: "Number of lines to retreieve per (E)JES API call.",
+            type: "number",
+            defaultValue: 200,
+            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+        };
 
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
-        name: "debug",
-        aliases: ["dbg"],
-        description: "Invoke debugging code.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-    };
+            name: "debug",
+            aliases: ["dbg"],
+            description: "Invoke debugging code.",
+            type: "boolean",
+            defaultValue: false,
+            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+        };
 
     /**
      * Options related to the (E)JES CLI
@@ -151,6 +172,8 @@ export class EjesSession extends Session {
         EjesSession.EJES_OPTION_PASSWORD,
         EjesSession.EJES_OPTION_REJECT_UNAUTHORIZED,
         EjesSession.EJES_OPTION_BASE_PATH,
+        EjesSession.EJES_OPTION_COLOR_SCHEME,
+        EjesSession.EJES_OPTION_NO_COLOR,
         EjesSession.EJES_OPTION_ENUMERATION_VALUE,
         EjesSession.EJES_OPTION_TIMER_INTERVAL,
         EjesSession.EJES_OPTION_DEBUG
@@ -222,12 +245,12 @@ export class EjesSession extends Session {
         }
     }
 
-    public showlog(resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
+    public showlog( resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
         let found = this.block ? false : true;
         let result = "";
         resp.loginfo.forEach((info, index) => {
-            if (!found) {
-                found = (info.blockId === this.block && info.recordId === this.record);
+            if ( ! found ) {
+                found = ( info.blockId === this.block && info.recordId === this.record );
                 return;
             }
             // if (find[index].length > 0) {
@@ -238,7 +261,7 @@ export class EjesSession extends Session {
                 result += (resp.lines[index] + "\n");
             }
         });
-        if (result) { this.params.response.console.log(result.substr(0, result.length - 1)); }
+        if ( result ) { this.params.response.console.log(result.substr(0, result.length - 1)); }
         this.block = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].blockId : "";
         this.record = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].recordId : 0;
     }
@@ -260,7 +283,7 @@ export class EjesSession extends Session {
                     // parse off token value, minus LtpaToken2= (as an example)
                     const split = element.indexOf("=");
                     if (split >= 0) {
-                        this.ISession.tokenType = element.substring(0, split);
+                        this.ISession.tokenType  = element.substring(0, split);
                         this.ISession.tokenValue = element.substring(split + 1);
                     }
                     else {

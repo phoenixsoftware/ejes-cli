@@ -4,17 +4,17 @@
         "node",
         "jest"
       ],
-      "target": "es2015",
+      "target": "es6",
       "module": "commonjs",
-      "declaration": true,
       "moduleResolution": "node",
-      "noImplicitAny": true,
+      "noImplicitAny": false,
       "outDir": "./lib",
       "preserveConstEnums": true,
       "removeComments": false,
-      "pretty": true,
+      "pretty": false,
       "sourceMap": true,
-      "newLine": "lf"
+      "newLine": "lf",
+      "allowJs": true
     },
     "include": [
       "src/**/*"

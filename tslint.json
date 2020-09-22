@@ -1,25 +1,30 @@
 {
   "extends": "tslint:latest",
   "rules": {
+    "align": [false, "statements"],
+    "comment-format": false,
+    "curly": false,
+    "interface-name": [false, "always-prefix"],
     "object-literal-sort-keys": false,
     "ordered-imports": false,
     "one-line": false,
     "space-within-parens": false,
     "no-var-requires": false,
+    "typedef-whitespace": false,
     "trailing-comma": false,
     "no-submodule-imports": [
       true
     ],
     "max-line-length": [
-      true,
-      150
+      false,
+      200
     ],
     "no-implicit-dependencies": [
       true,
       "dev"
     ],
     "no-magic-numbers": [
-      true,
+      false,
       -1,
       0,
       1,

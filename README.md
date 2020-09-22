@@ -6,12 +6,17 @@ While you can install and/or examine the source code here, you will require a li
 to use the underlying REST API and the (E)JES product.
 
 - [Zowe (E)JES REST API Manager Sample Plug-in](#zowe-(e)jes-rest-api-manager-sample-plug-in)
-  - [Available CLIs](#availabe-clis)
+  - [Available CLIs](#available-clis)
   - [There is help for that...](#there-is-help-for-that)
-  - [Documentation](#tutorials-documentation-and-guidelines)
+  - [Documentation](#documentation)
   - [Project Goals](#project-goals)
   - [Prerequisites](#prerequisites)
+  - [Installing the CLI using NPM (Recommended)](#installing-the-cli-using-npm)
+  - [Profiles (Required)](#profiles)
   - [Create a Local Development Space](#create-a-local-development-space)
+    - [Overview](#overview)
+    - [Clone Zowe (E)JES CLI and Install](#clone-the-zowe-ejes-cli-and-install)
+    - [Build the Zowe (E)JES CLI](#build-the-zowe-ejes-cli)
 
 ## Available CLIs
 
@@ -43,8 +48,8 @@ You can also issue the **help** command in *Zowe EJES Batch* and use the argumen
 
 ## Documentation
 
-Use of Zowe and our CLIs is documented in chapter 11 of the *(E)JES Reference*.  If you plan to use the Zowe plug-in but do not plan to develop it, please use to the section titled **Installing the CLI using NPM** instead of cloning the repository and either installing or building from there.
-Summary information for using this repository for your own (E)JES project can be found below.
+Use of Zowe and our CLIs is documented in chapter 11 of the *(E)JES Reference*.  If you plan to use the Zowe plug-in but do not plan to develop it, please use to the section titled [Installing the CLI using NPM](#installing-the-cli-using-npm) instead of [cloning the GitHub repository](#clone-the-zowe-(e)jes-cli-and-install) and either installing or building from there.
+Summary information for using this repository for your own (E)JES project can at the end of this document.
 
 [(top)](#readme)
 
@@ -72,10 +77,38 @@ Next, if you haven't done so already, [install the Zowe CLI globally.](https://d
 
 [(top)](#readme)
 
+## Installing the CLI using NPM
+
+Installing the CLI is the simpist and quickest way to be up and running with the Zowe (E)JES plugin.  Depending on whether or not npm is installed in a privileged location, you may require administrative priveleges.
+
+1. `npm install -g @phoenixsoftware/ejes-cli`
+
+2.  `zowe plugins install @phoenixsoftware/ejes-cli`
+
+Optionally, to store all logon credentials contained in Zowe CLI profiles in an encrypted format:
+
+3. `zowe plugins install @zowe/secure-credential-store-for-zowe-cli@zowe-v1-lts`
+
+[(top)](#readme)
+
+## Profiles
+
+After installing the [using NPM](#installing-the-cli-using-npm) or from [GitHub](#clone-the-zowe-ejes-cli-and-install), you are *required* to create a profile into which to store your host credentials.  Here is a prototype you can copy/paste and modify.
+
+`zowe profiles create ejes jes3 --protocol https --host yourhost.com --port 7554 --user myuid --password passw0rd --rejectUnauthorized true --basePath /api/v1/ejes3 --colorScheme dark --noColor off`
+
+Once your profile is created, you can use the following command to test the installation and connection to the host.  Mind upper- and lowercasing as Zowe is sensitive to this, or just copy/paste.
+
+`zowe ejes query st -V`
+
+[(top)](#readme)
+
 ## Create a Local Development Space
 
+The repository on GitHub contains all the materials for installing or building the project.
+
 ### Overview
-To create your development space, clone and install the plug-in.  The repository contains a transcompiled **/lib** folder from the current source in the repository.  This is so it can be immediately installed.
+To create your development space, clone and install the plug-in.  The repository contains a trans-compiled **/lib** folder from the current source in the repository.  This is so it can be immediately installed.
 
 Create a local development folder named `zowe-psi`. You will clone and build the project in this folder.
 
@@ -85,7 +118,8 @@ zowe-psi
 └── ejes-cli
 ```
 
-### Clone Zowe EJES CLI and Install
+### Clone the Zowe EJES CLI and Install
+
 Please review the installation process in chapter 11 of the *(E)JES Reference*.  What follows is a summary of installing from the repository.  Depending on whether or not npm is installed in a privileged location, you may require administrative priveleges.  In steps 4 and 5, mind the trailing period.
 1. `cd` to your `zowe-psi` folder
 2. `git clone https://github.com/phoenixsoftware/ejes-cli`
@@ -93,13 +127,7 @@ Please review the installation process in chapter 11 of the *(E)JES Reference*. 
 4. `npm install -g .`
 5. `zowe plugins install .`
 
-After installing, you need to create a profile.  Here is a prototype you can copy/paste and modify.
-
-`zowe profiles create ejes jes3 --protocol https --host yourhost.com --port 7554 --user myuid --password passw0rd --rejectUnauthorized true --basePath /api/v1/ejes3 --colorScheme dark --noColor off`
-
-Once your profile is created, you can use the following command to test the installation and connection to the host.  Mind upper- and lowercasing as Zowe is sensitive to this, or just copy/paste.
-
-`zowe ejes query st -V`
+The plug-in is ready for use.  You will require a Zowe profile for (E)JES.  How to create on is detailed in [profiles](#profiles) above.
 
 ### Build the Zowe EJES CLI
 Start Eclipse or VS Code.  Load the project.  Use the NPM script "build" to build after you have made changes.  Create your own git repository and configure it in your IDE.  

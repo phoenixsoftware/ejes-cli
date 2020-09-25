@@ -117,6 +117,13 @@ Clone the repositories into your development folder to match the following struc
 zowe-psi
 └── ejes-cli
 ```
+### The Package Lock File
+
+A *package-lock.json* file is installed with this project from GitHub.  This ensures that the same NPM packages installed when Phoenix Software built and *tested* this plug-in will be installed when you install the plug-in on your workstation.  
+
+If removed, NPM will install up-to-date versions of NPM modules in the node_modules directory.  You might want to do this if you see any NPM module vulnerability warning when installing.  
+
+No NPM modules were used to develop the (E)JES part of the plug-in.  However, the Zowe infrastructure upon which the plug-in is built uses NPM modules.  Additionally, the (E)JES API, Batch, and Query CLIs are provided *as* NPM modules (that do not themselves use NPM modules), thus the package-lock specifies the specific version built and tested, not the latest version.  For these reasons, you may decide to delete the provided package-lock.json file before running the *npm install* portion of the installation.  
 
 ### Clone the Zowe EJES CLI and Install
 
@@ -130,6 +137,7 @@ Please review the installation process in chapter 11 of the *(E)JES Reference*. 
 The plug-in is ready for use.  You will require a Zowe profile for (E)JES.  How to create on is detailed in [profiles](#profiles) above.
 
 ### Build the Zowe EJES CLI
+
 Start Eclipse or VS Code.  Load the project.  Use the NPM script "build" to build after you have made changes.  Create your own git repository and configure it in your IDE.  
 
 Zowe plug-in and CLI development is beyond the scope of this documentation.

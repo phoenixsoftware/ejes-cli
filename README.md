@@ -17,6 +17,7 @@ to use the underlying REST API and the (E)JES product.
     - [Overview](#overview)
     - [Clone Zowe (E)JES CLI and Install](#clone-the-zowe-ejes-cli-and-install)
     - [Build the Zowe (E)JES CLI](#build-the-zowe-ejes-cli)
+  - [Support](#support)
 
 ## Available CLIs
 
@@ -141,5 +142,11 @@ The plug-in is ready for use.  You will require a Zowe profile for (E)JES.  How 
 Start Eclipse or VS Code.  Load the project.  Use the NPM script "build" to build after you have made changes.  Create your own git repository and configure it in your IDE.  
 
 Zowe plug-in and CLI development is beyond the scope of this documentation.
+
+[(top)](#readme)
+
+## Support
+
+The programs stored in this repository are "distributed sample programs" as defined in chapter 18 of the _(E)JES Reference_.  (E)JES customers may request support on a time-available basis by opening a new (E)JES Zowe case on the Phoenix Software International support portal.  This is preferable to opening issues or making pull-requests on the GitHub repository.
 
 [(top)](#readme)

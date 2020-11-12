@@ -14,6 +14,7 @@ import { IEjes } from "../api/Doc/IEjes";
 
 /**
  * Utility Methods for EJES CLI
+ * NB: These definition are reflected in the help and presented option switches.
  * @export
  */
 export class EjesSession extends Session {
@@ -123,7 +124,7 @@ export class EjesSession extends Session {
      */
     public static EJES_OPTION_NO_COLOR: ICommandOptionDefinition = {
         name: "no-color",
-        aliases: ["noColor", "nc"],
+        aliases: ["nocolor", "nc"],
         description: "Accessibility option: Specify to prevent colorization of the CLI.  Same effect as defining NO_COLOR or FORCE_COLOR=0.",
         type: "string",
 //        defaultValue: "off",
@@ -160,6 +161,24 @@ export class EjesSession extends Session {
             group: EjesSession.EJES_RUNTIME_OPTION_GROUP
         };
 
+    public static EJES_OPTION_JES2: ICommandOptionDefinition = {
+        name: "jes2",
+        aliases: ["2"],
+        description: "Use the JES2 spooler instead of the default spooler.",
+        type: "boolean",
+        defaultValue: false,
+    group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_JES3: ICommandOptionDefinition = {
+        name: "jes3",
+        aliases: ["3"],
+        description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
+        type: "boolean",
+        defaultValue: false,
+    group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
+
     /**
      * Options related to the (E)JES CLI
      * These options can be filled in if the user creates a profile
@@ -176,7 +195,9 @@ export class EjesSession extends Session {
         EjesSession.EJES_OPTION_NO_COLOR,
         EjesSession.EJES_OPTION_ENUMERATION_VALUE,
         EjesSession.EJES_OPTION_TIMER_INTERVAL,
-        EjesSession.EJES_OPTION_DEBUG
+        EjesSession.EJES_OPTION_DEBUG,
+        EjesSession.EJES_OPTION_JES2,
+        EjesSession.EJES_OPTION_JES3
     ];
 
 
@@ -195,6 +216,7 @@ export class EjesSession extends Session {
         });
         session.params = params;
         session.logger = params.response.console;
+        session.subsystem = params.arguments.jes2 ? "JES2" : params.arguments.jes3 ? "JES3" : undefined;
 
         if (params.arguments.debug) {
             session.log("          params.arguments.protocol: " + params.arguments.protocol);
@@ -207,6 +229,8 @@ export class EjesSession extends Session {
             session.log("        params.arguments.enum-value: " + params.arguments.enumValue);
             session.log("    params.arguments.timer-interval: " + params.arguments.timerInterval);
             session.log("             params.arguments.debug: " + params.arguments.debug);
+            session.log("              params.arguments.jes2: " + params.arguments.jes2);
+            session.log("              params.arguments.jes3: " + params.arguments.jes3);
             session.log("           params.arguments.nonstop: " + params.arguments.nonstop);
             session.log("             params.arguments.first: " + params.arguments.first);
             session.log("              params.arguments.last: " + params.arguments.last);
@@ -223,6 +247,7 @@ export class EjesSession extends Session {
     public dataLines: number;
     public block = "";
     public record = 0;
+    public subsystem = undefined;
 
     private params: IHandlerParameters;
     private logger: IHandlerResponseConsoleApi;

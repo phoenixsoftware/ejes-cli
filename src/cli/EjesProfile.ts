@@ -121,7 +121,7 @@ export class EjesProfile extends Session {
      */
     public static EJES_OPTION_NO_COLOR: ICommandOptionDefinition = {
         name: "no-color",
-        aliases: ["noColor", "nc"],
+        aliases: ["nocolor", "nc"],
         description: "Accessibility option: Specify to prevent colorization of the CLI.  Same effect as defining NO_COLOR or FORCE_COLOR=0.",
         type: "string",
 //        defaultValue: "off",
@@ -152,11 +152,29 @@ export class EjesProfile extends Session {
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
             aliases: ["dbg"],
-            description: "Invoke debugging code in log stream command.",
+            description: "Invoke debugging code.",
             type: "boolean",
             defaultValue: false,
             group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-        };
+    };
+
+    public static EJES_OPTION_JES2: ICommandOptionDefinition = {
+        name: "jes2",
+        aliases: ["2"],
+        description: "Use the JES2 spooler instead of the default spooler.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_JES3: ICommandOptionDefinition = {
+        name: "jes3",
+        aliases: ["3"],
+        description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
 
     public static EJES_OPTION_HELP_APP: ICommandOptionDefinition = {
             name: "helpApp",
@@ -189,7 +207,9 @@ export class EjesProfile extends Session {
     public static EJES_RM_RUNTIME_OPTIONS: ICommandOptionDefinition[] = [
         EjesProfile.EJES_OPTION_ENUMERATION_VALUE,
         EjesProfile.EJES_OPTION_TIMER_INTERVAL,
-        EjesProfile.EJES_OPTION_DEBUG
+        EjesProfile.EJES_OPTION_DEBUG,
+        EjesProfile.EJES_OPTION_JES2,
+        EjesProfile.EJES_OPTION_JES3
     ];
     /**
      * Options related to the (E)JES CLI

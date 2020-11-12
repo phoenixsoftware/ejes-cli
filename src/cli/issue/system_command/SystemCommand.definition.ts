@@ -30,9 +30,11 @@ export const SystemCommandDefinition: ICommandDefinition = {
     description: "Issue a system command and receive console output as a report in text format.",
     options: [
       { name: "debug",      type: "number",  aliases: ["dbg"], description: "Specify a numeric debugging mode." },
-      { name: "dry-run",    type: "array", aliases: ["n"], description: "Run under dry-run protocols." },
-      { name: "lines",      type: "string",  aliases: ["y"], description: "Maximum lines in a table or report.  [1000 | tty-default | number | all]" },
-      { name: "width",      type: "string",  aliases: ["x"], description: "Maximum characters per line or row.  [tty-default | number | all]" },
+      { name: "dry-run",    type: "array",   aliases: ["n"],   description: "Run under dry-run protocols." },
+      { name: "jes2",       type: "boolean", aliases: ["2"],   description: "Use the JES2 spooler instead of the default spooler." },
+      { name: "jes3",       type: "boolean", aliases: ["3"],   description: "Use the JES3 or JES3plus spooler instead of the default spooler." },
+      { name: "lines",      type: "string",  aliases: ["y"],   description: "Maximum lines in a table or report.  [1000 | tty-default | number | all]" },
+      { name: "width",      type: "string",  aliases: ["x"],   description: "Maximum characters per line or row.  [tty-default | number | all]" },
     ],
     examples: [{
         description: "Display the time",

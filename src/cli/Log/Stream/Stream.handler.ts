@@ -111,8 +111,12 @@ export default class ListHandler implements ICommandHandler {
         };
 
         try {
-            response = await Ejes.init(this.session, { columns: this.session.columns, rows: this.session.rows },
-                { enumValue: this.session.dataLines, command: cmdPrimary });
+            let ip : object;
+            if ( this.session.subsystem )
+                ip = { subsystem: this.session.subsystem, columns: this.session.columns, rows: this.session.rows };
+            else
+                ip = { columns: this.session.columns, rows: this.session.rows };
+            response = await Ejes.init(this.session, ip, { enumValue: this.session.dataLines, command: cmdPrimary });
         }
         catch (e) {
             if ( ! signal ) {

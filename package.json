@@ -42,7 +42,7 @@
     "configurationModule": "lib/imperative.js"
   },
   "dependencies": {
-    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.4"
+    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.16"
   },
   "peerDependencies": {
     "@zowe/cli": "^6.13.0",

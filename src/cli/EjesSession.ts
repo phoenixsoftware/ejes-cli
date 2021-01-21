@@ -5,12 +5,12 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright (c) 2020 Phoenix Software International, Inc.
+* Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
-import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
-    Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
+import { ICommandOptionDefinition, Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
 import { IEjes } from "../api/Doc/IEjes";
+import { EjesProfile } from "./EjesProfile";
 
 /**
  * Utility Methods for EJES CLI
@@ -154,10 +154,10 @@ export class EjesSession extends Session {
 
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
-            aliases: ["dbg"],
-            description: "Invoke debugging code.",
-            type: "boolean",
-            defaultValue: false,
+            aliases: ["dbg", "dv", "d"],
+            description: "Invoke debugging code with additive flags.  1=request, 2=response, 4=maximumize response, 8=housekeeping.",
+            type: "number",
+            defaultValue: 0,
             group: EjesSession.EJES_RUNTIME_OPTION_GROUP
         };
 
@@ -167,7 +167,7 @@ export class EjesSession extends Session {
         description: "Use the JES2 spooler instead of the default spooler.",
         type: "boolean",
         defaultValue: false,
-    group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
     };
 
     public static EJES_OPTION_JES3: ICommandOptionDefinition = {
@@ -176,7 +176,23 @@ export class EjesSession extends Session {
         description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
         type: "boolean",
         defaultValue: false,
-    group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
+        name: "syslog",
+        aliases: ["sys"],
+        description: "Display the SYSLOG instead of the default log.  No support for --nonstop or --enumeration in V0.3.1.",
+        type: "boolean",
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_OPERLOG: ICommandOptionDefinition = {
+        name: "operlog",
+        aliases: ["oper"],
+        description: "Display the OPERLOG instead of the default log.",
+        type: "boolean",
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
     /**
@@ -197,7 +213,9 @@ export class EjesSession extends Session {
         EjesSession.EJES_OPTION_TIMER_INTERVAL,
         EjesSession.EJES_OPTION_DEBUG,
         EjesSession.EJES_OPTION_JES2,
-        EjesSession.EJES_OPTION_JES3
+        EjesSession.EJES_OPTION_JES3,
+        EjesProfile.EJES_OPTION_OPERLOG,
+        EjesProfile.EJES_OPTION_SYSLOG
     ];
 
 
@@ -218,7 +236,7 @@ export class EjesSession extends Session {
         session.logger = params.response.console;
         session.subsystem = params.arguments.jes2 ? "JES2" : params.arguments.jes3 ? "JES3" : undefined;
 
-        if (params.arguments.debug) {
+        if ( params.arguments.debug & session.DEBUG_HOUSEKEEPING ) {
             session.log("          params.arguments.protocol: " + params.arguments.protocol);
             session.log("              params.arguments.host: " + params.arguments.host);
             session.log("              params.arguments.port: " + params.arguments.port);
@@ -239,6 +257,17 @@ export class EjesSession extends Session {
 
         return session;
     }
+
+    public DEBUG_REQUEST = 1;
+    public DEBUG_RESPONSE = 2;
+    public DEBUG_RESPONSE_MAX = 4;
+    public DEBUG_ANY_RESPONSE = 6;
+    public DEBUG_HOUSEKEEPING = 8;
+    public DEBUG_BLOCKING = 16;
+    public DEBUG_FETCHING = 32;
+    public DEBUG_OUTPUT = 64;
+    public DEBUG_FETCHING_OUTPUT = this.DEBUG_FETCHING + this.DEBUG_OUTPUT; // 80
+    public DEBUG_TIMER = 128;
 
 
     public columns = 240;
@@ -264,45 +293,52 @@ export class EjesSession extends Session {
         this.logger.log(msg);
     }
 
-    public debugLog(msg: string) {
-        if (this.params.arguments.debug) {
+    public debugLog(level: number, msg: string) {
+        if ( this.params.arguments.debug & level ) {
             this.log(msg);
         }
     }
 
-    public showlog( resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): void {
+    public showlog( level: number, resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): boolean {
         let found = this.block ? false : true;
         let result = "";
+        if ( this.block === "" ) {
+            this.debugLog(this.DEBUG_FETCHING, "*** DEBUG *** EjesSession.showlog: Initalizing block to \"00\", resp.loginfo.length=" + resp.loginfo.length);
+            this.block = "00";
+         }
         resp.loginfo.forEach((info, index) => {
             if ( ! found ) {
-                found = ( info.blockId === this.block && info.recordId === this.record );
-                return;
+                found = ( parseInt(info.blockId, 16) > parseInt(this.block, 16) || (info.blockId === this.block && info.recordId > this.record) );
+                this.debugLog(this.DEBUG_FETCHING, "*** DEBUG *** EjesSession.showlog: " + (found ? "(match)" : "(fail) ") + " TEST=" + (info.blockId + " " + info.recordId.toString().padStart(3, "0") + " COMP=" + (this.block + " " + this.record.toString().padStart(3, "0") + " ")));
+                if ( ! found ) { return; }
             }
-            // if (find[index].length > 0) {
             if (acceptLine(resp, index)) {
-                if (this.params.arguments.debug) {
-                    result += (info.blockId + " ");
-                }
+                if (this.params.arguments.debug & (this.DEBUG_OUTPUT + this.DEBUG_BLOCKING))
+                    result += (info.blockId + " " + info.recordId.toString().padStart(3, "0") + " ");
                 result += (resp.lines[index] + "\n");
             }
         });
-        if ( result ) { this.params.response.console.log(result.substr(0, result.length - 1)); }
-        this.block = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].blockId : "";
-        this.record = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].recordId : 0;
+        if ( result ) {
+            this.params.response.console.log(result.substr(0, result.length - 1));
+            this.block = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].blockId : "";
+            this.record = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].recordId : 0;
+            this.debugLog(this.DEBUG_OUTPUT, "*** DEBUG *** EjesSession.showlog: Now expecting a blk/rec >- to: " + (this.block + " " + this.record.toString().padStart(3, "0") + " "));
+        }
+        return result.length > 0;
     }
 
     public storeCookie(cookie: any) {
-        this.debugLog("*** DEBUG ***  storeCookie has been invoked.");
-        this.debugLog("*** DEBUG ***  ISession.tokenType: " + this.ISession.tokenType);
+        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  storeCookie has been invoked.");
+        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  ISession.tokenType: " + this.ISession.tokenType);
 
         const headerKeys: string[] = Object.keys(cookie);
         headerKeys.forEach((key) => {
             const auth = cookie[key] as string;
             const authArr = auth.split(";");
-            this.debugLog("*** DEBUG ***  key: " + key + ", auth: " + auth);
+            this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  key: " + key + ", auth: " + auth);
             // see each field in the cookie, e/g. Path=/; Secure; HttpOnly; LtpaToken2=...
             authArr.forEach((element: string) => {
-                this.debugLog("*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
+                this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
                 // if we match requested token type, save it off for its length
                 if (element.indexOf(this.ISession.tokenType) === 0) {
                     // parse off token value, minus LtpaToken2= (as an example)
@@ -311,10 +347,9 @@ export class EjesSession extends Session {
                         this.ISession.tokenType  = element.substring(0, split);
                         this.ISession.tokenValue = element.substring(split + 1);
                     }
-                    else {
+                    else
                         this.ISession.tokenValue = "";
-                    }
-                    this.debugLog("*** DEBUG ***  tokenType: " + this.ISession.tokenType + ", tokenValue: " + this.ISession.tokenValue);
+                    this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  tokenType: " + this.ISession.tokenType + ", tokenValue: " + this.ISession.tokenValue);
                 }
             });
         });

@@ -5,7 +5,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright (c) 2020 Phoenix Software International, Inc.
+* Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
 export interface ILogInfo {
@@ -42,7 +42,42 @@ export interface IPosition {
     numberOfLines: number;
 }
 
+export interface IBrowseInfo {
+    type: string;
+    recordLength: number;
+    recordFormat: string;
+    cc: string;
+}
+
+export interface IsdsbInfo {
+    items: [string];
+}
+
+export interface ICurrentRowJobInfo {
+    isActiveJob: boolean;
+    isClientJob: boolean;
+    jobId: string;
+    jobName: string;
+    jobNumber: number;
+    jobType: string;
+}
+
+export interface IFunction {
+    findInfo?: FindInfoArray;
+    functionName?: string;
+    functionType?: string;
+    lineCommands?: [string];
+    browseInfo?: IBrowseInfo;
+    sdsbInfo?: IsdsbInfo;
+    currentLineText: string;
+    currentRowColumnInfo: [string];
+    map: object;
+    currentRowJobInfo?: ICurrentRowJobInfo;
+    currentRowKey?: string;
+}
+
 export interface IEjes {
+    function?: IFunction;
     position?: IPosition;
     find?: FindInfoArray;
     lines?: [string];

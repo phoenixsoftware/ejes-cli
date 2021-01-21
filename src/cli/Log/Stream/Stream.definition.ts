@@ -5,14 +5,14 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright (c) 2020 Phoenix Software International, Inc.
+* Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
 import * as path from "path";
 import { ICommandDefinition } from "@zowe/imperative";
 
 
-const FIND_OPTIONS = "Find options";
+const FIND_OPTIONS = "Find options (DEPRICATED - Syntax Support Only)";
 
 export const StreamDefinition: ICommandDefinition = {
     name: "stream",

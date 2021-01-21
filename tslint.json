@@ -10,6 +10,7 @@
     "one-line": false,
     "space-within-parens": false,
     "no-var-requires": false,
+    "no-bitwise": false,
     "typedef-whitespace": false,
     "trailing-comma": false,
     "no-submodule-imports": [

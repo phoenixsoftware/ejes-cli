@@ -5,7 +5,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright (c) 2020 Phoenix Software International, Inc.
+* Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
 import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
@@ -151,10 +151,10 @@ export class EjesProfile extends Session {
 
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
-            aliases: ["dbg"],
-            description: "Invoke debugging code.",
-            type: "boolean",
-            defaultValue: false,
+            aliases: ["dbg", "dv", "d"],
+            description: "Invoke debugging code with additive flags.  1=request, 2=response, 4=maximumize response, 8=housekeeping, 16=show block/record id, 32=fetching, 64=output.",
+            type: "number",
+            defaultValue: 0,
             group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
@@ -171,6 +171,24 @@ export class EjesProfile extends Session {
         name: "jes3",
         aliases: ["3"],
         description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
+        name: "syslog",
+        aliases: ["sys"],
+        description: "Display the SYSLOG instead of the default log.  No support for --nonstop or --enumeration in V0.3.1.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_OPERLOG: ICommandOptionDefinition = {
+        name: "operlog",
+        aliases: ["oper"],
+        description: "Display the OPERLOG instead of the default log.",
         type: "boolean",
         defaultValue: false,
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
@@ -209,7 +227,9 @@ export class EjesProfile extends Session {
         EjesProfile.EJES_OPTION_TIMER_INTERVAL,
         EjesProfile.EJES_OPTION_DEBUG,
         EjesProfile.EJES_OPTION_JES2,
-        EjesProfile.EJES_OPTION_JES3
+        EjesProfile.EJES_OPTION_JES3,
+        EjesProfile.EJES_OPTION_OPERLOG,
+        EjesProfile.EJES_OPTION_SYSLOG,
     ];
     /**
      * Options related to the (E)JES CLI

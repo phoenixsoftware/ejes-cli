@@ -5,7 +5,7 @@
 *
 * SPDX-License-Identifier: EPL-2.0
 *
-* Copyright (c) 2020 Phoenix Software International, Inc.
+* Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
 /* This module acts as a handler for each of the EJES primary displays.

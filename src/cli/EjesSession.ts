@@ -9,7 +9,6 @@
 */
 
 import { ICommandOptionDefinition, Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
-import { IEjes } from "../api/Doc/IEjes";
 import { EjesProfile } from "./EjesProfile";
 
 /**
@@ -155,11 +154,20 @@ export class EjesSession extends Session {
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
             aliases: ["dbg", "dv", "d"],
-            description: "Invoke debugging code with additive flags.  1=request, 2=response, 4=maximumize response, 8=housekeeping.",
+            description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show fetch metadata.",
             type: "number",
             defaultValue: 0,
             group: EjesSession.EJES_RUNTIME_OPTION_GROUP
         };
+
+    public static EJES_OPTION_DETAILED_JSON: ICommandOptionDefinition = {
+        name: "detailed-json",
+        aliases: ["detailedjson", "detail", "dj"],
+        description: "Include metadata objects and arrays in --rfj output, not just an array of lines.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
 
     public static EJES_OPTION_JES2: ICommandOptionDefinition = {
         name: "jes2",
@@ -179,10 +187,27 @@ export class EjesSession extends Session {
         group: EjesSession.EJES_RUNTIME_OPTION_GROUP
     };
 
+    public static EJES_OPTION_SUBSYSTEM: ICommandOptionDefinition = {
+        name: "subsystem",
+        aliases: ["subsys", "ss"],
+        description: "Specify the JES spooler system to use instead of the default spooler.",
+        type: "string",
+        defaultValue: false,
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_LOGSYS: ICommandOptionDefinition = {
+        name: "logsys",
+        aliases: ["l"],
+        description: "Specify a syslog to display by specifying the MVS name of a system in a JES2 environment.  The current system is browsed by default.",
+        type: "string",
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
     public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
         name: "syslog",
         aliases: ["sys"],
-        description: "Display the SYSLOG instead of the default log.  No support for --nonstop or --enumeration in V0.3.1.",
+        description: "Display the SYSLOG instead of the default log.",
         type: "boolean",
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
@@ -212,10 +237,13 @@ export class EjesSession extends Session {
         EjesSession.EJES_OPTION_ENUMERATION_VALUE,
         EjesSession.EJES_OPTION_TIMER_INTERVAL,
         EjesSession.EJES_OPTION_DEBUG,
+        EjesSession.EJES_OPTION_DETAILED_JSON,
         EjesSession.EJES_OPTION_JES2,
         EjesSession.EJES_OPTION_JES3,
+        EjesSession.EJES_OPTION_SUBSYSTEM,
         EjesProfile.EJES_OPTION_OPERLOG,
-        EjesProfile.EJES_OPTION_SYSLOG
+        EjesProfile.EJES_OPTION_SYSLOG,
+        EjesProfile.EJES_OPTION_LOGSYS
     ];
 
 
@@ -234,7 +262,7 @@ export class EjesSession extends Session {
         });
         session.params = params;
         session.logger = params.response.console;
-        session.subsystem = params.arguments.jes2 ? "JES2" : params.arguments.jes3 ? "JES3" : undefined;
+        session.subsystem = params.arguments.subsystem ? params.arguments.subsystem.toUpperCase() : params.arguments.jes2 ? "JES2" : params.arguments.jes3 ? "JES3" : undefined;
 
         if ( params.arguments.debug & session.DEBUG_HOUSEKEEPING ) {
             session.log("          params.arguments.protocol: " + params.arguments.protocol);
@@ -247,8 +275,10 @@ export class EjesSession extends Session {
             session.log("        params.arguments.enum-value: " + params.arguments.enumValue);
             session.log("    params.arguments.timer-interval: " + params.arguments.timerInterval);
             session.log("             params.arguments.debug: " + params.arguments.debug);
+            session.log("      params.arguments.detailedjson: " + params.arguments.detailedjson);
             session.log("              params.arguments.jes2: " + params.arguments.jes2);
             session.log("              params.arguments.jes3: " + params.arguments.jes3);
+            session.log("         params.arguments.subsystem: " + params.arguments.subsystem);
             session.log("           params.arguments.nonstop: " + params.arguments.nonstop);
             session.log("             params.arguments.first: " + params.arguments.first);
             session.log("              params.arguments.last: " + params.arguments.last);
@@ -263,68 +293,33 @@ export class EjesSession extends Session {
     public DEBUG_RESPONSE_MAX = 4;
     public DEBUG_ANY_RESPONSE = 6;
     public DEBUG_HOUSEKEEPING = 8;
-    public DEBUG_BLOCKING = 16;
-    public DEBUG_FETCHING = 32;
-    public DEBUG_OUTPUT = 64;
-    public DEBUG_FETCHING_OUTPUT = this.DEBUG_FETCHING + this.DEBUG_OUTPUT; // 80
-    public DEBUG_TIMER = 128;
-
+    public DEBUG_RECORD_INFO = 16;
+    public DEBUG_FETCH_METADATA = 32;
 
     public columns = 240;
     public rows = 63;
-    public rowOverhead = 6;
-    public dataLines: number;
-    public block = "";
-    public record = 0;
+    public initialEnumeration = -1; // Will fetch all of the initial enumeration, which will be one screen's worth.
     public subsystem = undefined;
 
     private params: IHandlerParameters;
     private logger: IHandlerResponseConsoleApi;
 
-
     constructor(newSession: ISession) {
         super(newSession);
-        this.dataLines = (this.rows - this.rowOverhead);
-        this.block = "";
-        this.record = 0;
     }
 
     public log(msg: string) {
         this.logger.log(msg);
     }
 
+    public error(msg: string) {
+        this.logger.error(msg);
+    }
+
     public debugLog(level: number, msg: string) {
         if ( this.params.arguments.debug & level ) {
             this.log(msg);
         }
-    }
-
-    public showlog( level: number, resp: IEjes, acceptLine: (response: IEjes, index: number) => boolean): boolean {
-        let found = this.block ? false : true;
-        let result = "";
-        if ( this.block === "" ) {
-            this.debugLog(this.DEBUG_FETCHING, "*** DEBUG *** EjesSession.showlog: Initalizing block to \"00\", resp.loginfo.length=" + resp.loginfo.length);
-            this.block = "00";
-         }
-        resp.loginfo.forEach((info, index) => {
-            if ( ! found ) {
-                found = ( parseInt(info.blockId, 16) > parseInt(this.block, 16) || (info.blockId === this.block && info.recordId > this.record) );
-                this.debugLog(this.DEBUG_FETCHING, "*** DEBUG *** EjesSession.showlog: " + (found ? "(match)" : "(fail) ") + " TEST=" + (info.blockId + " " + info.recordId.toString().padStart(3, "0") + " COMP=" + (this.block + " " + this.record.toString().padStart(3, "0") + " ")));
-                if ( ! found ) { return; }
-            }
-            if (acceptLine(resp, index)) {
-                if (this.params.arguments.debug & (this.DEBUG_OUTPUT + this.DEBUG_BLOCKING))
-                    result += (info.blockId + " " + info.recordId.toString().padStart(3, "0") + " ");
-                result += (resp.lines[index] + "\n");
-            }
-        });
-        if ( result ) {
-            this.params.response.console.log(result.substr(0, result.length - 1));
-            this.block = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].blockId : "";
-            this.record = resp.loginfo.length ? resp.loginfo[resp.loginfo.length - 1].recordId : 0;
-            this.debugLog(this.DEBUG_OUTPUT, "*** DEBUG *** EjesSession.showlog: Now expecting a blk/rec >- to: " + (this.block + " " + this.record.toString().padStart(3, "0") + " "));
-        }
-        return result.length > 0;
     }
 
     public storeCookie(cookie: any) {
@@ -340,10 +335,10 @@ export class EjesSession extends Session {
             authArr.forEach((element: string) => {
                 this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
                 // if we match requested token type, save it off for its length
-                if (element.indexOf(this.ISession.tokenType) === 0) {
+                if ( element.indexOf(this.ISession.tokenType) === 0 ) {
                     // parse off token value, minus LtpaToken2= (as an example)
                     const split = element.indexOf("=");
-                    if (split >= 0) {
+                    if ( split >= 0 ) {
                         this.ISession.tokenType  = element.substring(0, split);
                         this.ISession.tokenValue = element.substring(split + 1);
                     }

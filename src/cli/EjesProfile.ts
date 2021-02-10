@@ -152,10 +152,19 @@ export class EjesProfile extends Session {
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
             aliases: ["dbg", "dv", "d"],
-            description: "Invoke debugging code with additive flags.  1=request, 2=response, 4=maximumize response, 8=housekeeping, 16=show block/record id, 32=fetching, 64=output.",
+            description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show fetch metadata.",
             type: "number",
             defaultValue: 0,
             group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_DETAILED_JSON: ICommandOptionDefinition = {
+        name: "detailed-json",
+        aliases: ["detailedjson", "detail", "dj"],
+        description: "Include metadata objects and arrays in --rfj output, not just an array of lines.",
+        type: "boolean",
+        defaultValue: false,
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
     public static EJES_OPTION_JES2: ICommandOptionDefinition = {
@@ -176,10 +185,26 @@ export class EjesProfile extends Session {
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
+    public static EJES_OPTION_SUBSYSTEM: ICommandOptionDefinition = {
+        name: "subsystem",
+        aliases: ["subsys", "ss"],
+        description: "Specify the JES spooler system to use instead of the default spooler.",
+        type: "string",
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
+    public static EJES_OPTION_LOGSYS: ICommandOptionDefinition = {
+        name: "logsys",
+        aliases: ["l"],
+        description: "Specify a syslog to display by specifying the MVS name of a system in a JES2 environment.  The current system is browsed by default.",
+        type: "string",
+        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
+    };
+
     public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
         name: "syslog",
         aliases: ["sys"],
-        description: "Display the SYSLOG instead of the default log.  No support for --nonstop or --enumeration in V0.3.1.",
+        description: "Display the SYSLOG instead of the default log.",
         type: "boolean",
         defaultValue: false,
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
@@ -226,10 +251,13 @@ export class EjesProfile extends Session {
         EjesProfile.EJES_OPTION_ENUMERATION_VALUE,
         EjesProfile.EJES_OPTION_TIMER_INTERVAL,
         EjesProfile.EJES_OPTION_DEBUG,
+        EjesProfile.EJES_OPTION_DETAILED_JSON,
         EjesProfile.EJES_OPTION_JES2,
         EjesProfile.EJES_OPTION_JES3,
+        EjesProfile.EJES_OPTION_SUBSYSTEM,
         EjesProfile.EJES_OPTION_OPERLOG,
         EjesProfile.EJES_OPTION_SYSLOG,
+        EjesProfile.EJES_OPTION_LOGSYS
     ];
     /**
      * Options related to the (E)JES CLI

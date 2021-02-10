@@ -62,6 +62,12 @@ export interface ICurrentRowJobInfo {
     jobType: string;
 }
 
+export interface INotice {
+    filterNotices: [string];
+    optionNotices: [string];
+    viewNotices: [string];
+}
+
 export interface IFunction {
     findInfo?: FindInfoArray;
     functionName?: string;
@@ -79,6 +85,7 @@ export interface IFunction {
 export interface IEjes {
     function?: IFunction;
     position?: IPosition;
+    notice?: INotice;
     find?: FindInfoArray;
     lines?: [string];
     loginfo?: LogInfoArray;

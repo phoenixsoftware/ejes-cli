@@ -24,6 +24,7 @@
   ],
   "scripts": {
     "psi_build": "echo [psi_build] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes && echo [psi_build] Test Zowe plugin... && zowe ejes query st -V  && echo [psi_build] Build complete.",
+    "lint": "tslint \"src/**/*.ts\"",
     "psi_activateEjes_from_libEjes": "echo [psi_activateEjes_from_libEjes] Activating EJES in the project libEjes directory... && cd libEjes && echo [psi_activateEjes_from_libEjes] libEjes Directory: && cd && npm link . && cd .. && cd && echo [psi_activateEjes_from_libEjes] Test pure node ejes... && ejes batch sh -V && echo [psi_activateEjes_from_libEjes] EJES activated from the project libEjes directory.",
     "psi_deactivateEjes_from_libEjes": "echo [psi_deactivateEjes_from_libEjes] Deactivating EJES in project libEjes directory && cd libEjes && echo [psi_deactivateEjes_from_libEjes] libEjes Directory: && cd && npm unlink . && cd .. && echo [dectivateEjesDev] ejesRM Directory: && cd && echo [dectivateEjesDev] EJES deactivated in the project libEjes.",
     "build": "echo [build] Beginning installation. && npm install && npm run clean && npm run vanillaBuild && npm run lint && zowe plugins install . && echo [build] Test Zowe plugin... && zowe ejes query st -V  && echo [build] Build and activation complete.",
@@ -35,14 +36,13 @@
     "uninstallPlugin": "echo [uninstallPlugin] Uninstalling Zowe Plugin... && zowe plugins uninstall @phoenixsoftware/ejes-cli && echo [uninstallPlugin] Uninstall complete.",
     "vanillaBuild": "node scripts/updateLicense.js && tsc",
     "clean": "rimraf lib",
-    "prepublishOnly": "npm run build",
-    "lint": "tslint \"src/**/*.ts\""
+    "prepublishOnly": "npm run build"
   },
   "imperative": {
     "configurationModule": "lib/imperative.js"
   },
   "dependencies": {
-    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.17"
+    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.18"
   },
   "peerDependencies": {
     "@zowe/cli": "^6.13.0",

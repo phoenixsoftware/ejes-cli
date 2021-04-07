@@ -1,6 +1,6 @@
 {
   "name": "@phoenixsoftware/ejes-cli",
-  "version": "0.2.11",
+  "version": "0.2.20",
   "description": "(E)JES RESTapi Manager for Zowe",
   "homepage": "https://github.com/phoenixsoftware/ejes-cli#readme",
   "bugs": {
@@ -42,7 +42,7 @@
     "configurationModule": "lib/imperative.js"
   },
   "dependencies": {
-    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.18"
+    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.20"
   },
   "peerDependencies": {
     "@zowe/cli": "^6.13.0",

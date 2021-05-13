@@ -1,6 +1,6 @@
 {
   "name": "@phoenixsoftware/ejes-cli",
-  "version": "0.2.20",
+  "version": "1.0.5",
   "description": "(E)JES RESTapi Manager for Zowe",
   "homepage": "https://github.com/phoenixsoftware/ejes-cli#readme",
   "bugs": {
@@ -23,10 +23,12 @@
     "lib"
   ],
   "scripts": {
-    "psi_build": "echo [psi_build] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes && echo [psi_build] Test Zowe plugin... && zowe ejes query st -V  && echo [psi_build] Build complete.",
+    "psi_build": "echo [psi_build] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes && echo [psi_build] Build complete.",
     "lint": "tslint \"src/**/*.ts\"",
-    "psi_activateEjes_from_libEjes": "echo [psi_activateEjes_from_libEjes] Activating EJES in the project libEjes directory... && cd libEjes && echo [psi_activateEjes_from_libEjes] libEjes Directory: && cd && npm link . && cd .. && cd && echo [psi_activateEjes_from_libEjes] Test pure node ejes... && ejes batch sh -V && echo [psi_activateEjes_from_libEjes] EJES activated from the project libEjes directory.",
+    "psi_activateEjes_from_libEjes": "echo [psi_activateEjes_from_libEjes] Activating EJES in the project libEjes directory... && cd libEjes && echo [psi_activateEjes_from_libEjes] libEjes Directory: && cd && npm link . && cd .. && cd && echo [psi_activateEjes_from_libEjes] EJES activated from the project libEjes directory.",
     "psi_deactivateEjes_from_libEjes": "echo [psi_deactivateEjes_from_libEjes] Deactivating EJES in project libEjes directory && cd libEjes && echo [psi_deactivateEjes_from_libEjes] libEjes Directory: && cd && npm unlink . && cd .. && echo [dectivateEjesDev] ejesRM Directory: && cd && echo [dectivateEjesDev] EJES deactivated in the project libEjes.",
+    "psi_build_and_test": "echo [psi_build_test] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes_test && echo [psi_build_test] Test Zowe plugin... && zowe ejes query st -V  && echo [psi_build_test] Build complete.",
+    "psi_activateEjes_from_libEjes_test": "echo [psi_activateEjes_from_libEjes_test] Activating EJES in the project libEjes directory... && cd libEjes && echo [psi_activateEjes_from_libEjes_test] libEjes Directory: && cd && npm link . && cd .. && cd && echo [psi_activateEjes_from_libEjes_test] Test pure node ejes... && ejes batch sh -V && echo [psi_activateEjes_from_libEjes_test] EJES activated from the project libEjes directory.",
     "build": "echo [build] Beginning installation. && npm install && npm run clean && npm run vanillaBuild && npm run lint && zowe plugins install . && echo [build] Test Zowe plugin... && zowe ejes query st -V  && echo [build] Build and activation complete.",
     "activateEjes": "echo [activateEjes] Activating EJES from the node_modules directory... && cd node_modules/phoenixsoftware/ejes-restapi-node-clis && echo [activateEjes] libEjes Directory: && cd  && npm link . && cd ../../.. && cd && echo [activateEjes] Test pure node ejes... && ejes batch sh -V && echo [activateEjes] EJES activated in the mode_modules directory.",
     "deactivateEjes": "echo [deactivateEjes] Deactivating Ejes in the node_modules directory && cd node_modules/phoenixsoftware/ejes-restapi-node-clis && echo [deactivateEjes] libEjes Directory: && cd && npm unlink . && cd ../../.. && echo [deactivateEjes] ejesRM Directory: && cd && echo [deactivateEjes] EJES deactivated in the node_modules directory.",
@@ -42,7 +44,7 @@
     "configurationModule": "lib/imperative.js"
   },
   "dependencies": {
-    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.20"
+    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.22"
   },
   "peerDependencies": {
     "@zowe/cli": "^6.13.0",
@@ -59,7 +61,7 @@
     "rimraf": "^2.7.1",
     "ts-node": "^3.2.0",
     "tslint": "^5.20.1",
-    "typedoc": "^0.20.34",
+    "typedoc": "^0.20.36",
     "typescript": "3.9.2",
     "uuid": "^3.4.0"
   },

@@ -15,9 +15,9 @@ import { RestClient, Session, ImperativeExpect, IHandlerParameters, Logger, Impe
 
 export class Ejes {
 
-    public static readonly EJES_INIT            = "/init?q=loginfo,environment,version,function,notice,position,message,lines";
+    public static readonly EJES_INIT            = "/init?q=loginfo,environment,version,function,find,notice,position,message,lines";
     public static readonly EJES_CANCEL_DOWNLOAD = "/cancel-download";
-    public static readonly EJES_EXEC            = "/exec?q=loginfo,position,message,lines";
+    public static readonly EJES_EXEC            = "/exec?q=loginfo,position,find,notice,message,lines";
     public static readonly EJES_TERM            = "/term";
 
     public static init(session: EjesSession, ip: object, ep: object, debug: number = 0): Promise<IEjes> {

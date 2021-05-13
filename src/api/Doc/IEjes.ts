@@ -82,7 +82,13 @@ export interface IFunction {
     currentRowKey?: string;
 }
 
+
+export interface IScreen {
+    screenImage: [[]];
+}
+
 export interface IEjes {
+    screen?: IScreen;
     function?: IFunction;
     position?: IPosition;
     notice?: INotice;

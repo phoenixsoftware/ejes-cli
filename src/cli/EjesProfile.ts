@@ -10,6 +10,8 @@
 
 import { ICommandArguments, ICommandOptionDefinition, IProfile, Logger,
     Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
+// import { EjesSession } from "./EjesSession";
+// import { Ejes } from "../api/Ejes";
 // import { IEjes } from "../api/Doc/IEjes";
 
 /**
@@ -132,11 +134,12 @@ export class EjesProfile extends Session {
      * Option used in profile creation and commands for CLI run-time configuration.
      */
     public static EJES_OPTION_TIMER_INTERVAL: ICommandOptionDefinition = {
-        name: "timer-interval",
-        aliases: ["timeint", "ti"],
-        description: "Number of milliseconds between (E)JES API calls in log stream command.",
+        name: "refresh-interval",
+        aliases: ["refreshInterval", "refresh", "ri"],
+        description: "Number of seconds between (E)JES API calls in log stream command.  The actual minimum and maximum interval is controlled by your host refresh command settings.",
         type: "number",
-        defaultValue: 2000,
+        defaultValue: 5,
+        numericValueRange: [1, 100],
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
@@ -152,7 +155,7 @@ export class EjesProfile extends Session {
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
             name: "debug",
             aliases: ["dbg", "dv", "d"],
-            description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show fetch metadata.",
+            description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show notifications, 64=show fetch metadata.",
             type: "number",
             defaultValue: 0,
             group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
@@ -167,66 +170,14 @@ export class EjesProfile extends Session {
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
-    public static EJES_OPTION_JES2: ICommandOptionDefinition = {
-        name: "jes2",
-        aliases: ["2"],
-        description: "Use the JES2 spooler instead of the default spooler.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_JES3: ICommandOptionDefinition = {
-        name: "jes3",
-        aliases: ["3"],
-        description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_SUBSYSTEM: ICommandOptionDefinition = {
-        name: "subsystem",
-        aliases: ["subsys", "ss"],
-        description: "Specify the JES spooler system to use instead of the default spooler.",
-        type: "string",
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_LOGSYS: ICommandOptionDefinition = {
-        name: "logsys",
-        aliases: ["l"],
-        description: "Specify a syslog to display by specifying the MVS name of a system in a JES2 environment.  The current system is browsed by default.",
-        type: "string",
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
-        name: "syslog",
-        aliases: ["sys"],
-        description: "Display the SYSLOG instead of the default log.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_OPERLOG: ICommandOptionDefinition = {
-        name: "operlog",
-        aliases: ["oper"],
-        description: "Display the OPERLOG instead of the default log.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
     public static EJES_OPTION_HELP_APP: ICommandOptionDefinition = {
-            name: "helpApp",
-            aliases: ["ha"],
-            description: "Invoke extended application specific detailed help.",
-            type: "array",
+        name: "helpApp",
+        aliases: ["ha"],
+        description: "Invoke extended application specific detailed help.",
+        type: "array",
 //            defaultValue: "usage",
-            group: EjesProfile.GLOBAL_OPTIONS
-        };
+        group: EjesProfile.GLOBAL_OPTIONS
+    };
 
     /**
      * Options related to the (E)JES CLI
@@ -241,7 +192,7 @@ export class EjesProfile extends Session {
         EjesProfile.EJES_OPTION_REJECT_UNAUTHORIZED,
         EjesProfile.EJES_OPTION_BASE_PATH,
         EjesProfile.EJES_OPTION_COLOR_SCHEME,
-        EjesProfile.EJES_OPTION_NO_COLOR
+        EjesProfile.EJES_OPTION_NO_COLOR,
     ];
     /**
      * Options related to the (E)JES CLI
@@ -252,12 +203,6 @@ export class EjesProfile extends Session {
         EjesProfile.EJES_OPTION_TIMER_INTERVAL,
         EjesProfile.EJES_OPTION_DEBUG,
         EjesProfile.EJES_OPTION_DETAILED_JSON,
-        EjesProfile.EJES_OPTION_JES2,
-        EjesProfile.EJES_OPTION_JES3,
-        EjesProfile.EJES_OPTION_SUBSYSTEM,
-        EjesProfile.EJES_OPTION_OPERLOG,
-        EjesProfile.EJES_OPTION_SYSLOG,
-        EjesProfile.EJES_OPTION_LOGSYS
     ];
     /**
      * Options related to the (E)JES CLI

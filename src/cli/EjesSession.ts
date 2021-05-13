@@ -9,7 +9,9 @@
 */
 
 import { ICommandOptionDefinition, Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
+import { Ejes } from "../api/Ejes";
 import { EjesProfile } from "./EjesProfile";
+import * as util from "util";
 
 /**
  * Utility Methods for EJES CLI
@@ -31,7 +33,7 @@ export class EjesSession extends Session {
         type: "string",
         defaultValue: "https",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP,
-        allowableValues: { values: [ "http", "https" ], caseSensitive: false },
+        allowableValues: { values: ["http", "https"], caseSensitive: false },
     };
 
     /**
@@ -126,7 +128,7 @@ export class EjesSession extends Session {
         aliases: ["nocolor", "nc"],
         description: "Accessibility option: Specify to prevent colorization of the CLI.  Same effect as defining NO_COLOR or FORCE_COLOR=0.",
         type: "string",
-//        defaultValue: "off",
+        //        defaultValue: "off",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP
     };
 
@@ -134,31 +136,32 @@ export class EjesSession extends Session {
      * Option used in profile creation and commands for CLI run-time configuration.
      */
     public static EJES_OPTION_TIMER_INTERVAL: ICommandOptionDefinition = {
-        name: "timer-interval",
-        aliases: ["timeint", "ti"],
-        description: "Number of milliseconds between (E)JES API calls.",
+        name: "refresh-interval",
+        aliases: ["refreshInterval", "refresh", "ri"],
+        description: "Number of seconds between (E)JES API calls in log stream command.  The actual minimum and maximum interval is controlled by your host refresh command settings.",
         type: "number",
-        defaultValue: 2000,
+        defaultValue: 5,
+        numericValueRange: [1, 100],
         group: EjesSession.EJES_RUNTIME_OPTION_GROUP
     };
 
     public static EJES_OPTION_ENUMERATION_VALUE: ICommandOptionDefinition = {
-            name: "enum-value",
-            aliases: ["enumval", "ev"],
-            description: "Number of lines to retreieve per (E)JES API call.",
-            type: "number",
-            defaultValue: 200,
-            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-        };
+        name: "enum-value",
+        aliases: ["enumval", "ev"],
+        description: "Number of lines to retreieve per (E)JES API call.  Overridden by the combination of --rfj and --line (-n).  See --line.",
+        type: "number",
+        defaultValue: 200,
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
 
     public static EJES_OPTION_DEBUG: ICommandOptionDefinition = {
-            name: "debug",
-            aliases: ["dbg", "dv", "d"],
-            description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show fetch metadata.",
-            type: "number",
-            defaultValue: 0,
-            group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-        };
+        name: "debug",
+        aliases: ["dbg", "dv", "d"],
+        description: "Invoke debugging code with additive flags.  1=request, 2=minimum response, 4=full response, 8=housekeeping, 16=show record info, 32=show fetch metadata.",
+        type: "number",
+        defaultValue: 0,
+        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
+    };
 
     public static EJES_OPTION_DETAILED_JSON: ICommandOptionDefinition = {
         name: "detailed-json",
@@ -166,57 +169,6 @@ export class EjesSession extends Session {
         description: "Include metadata objects and arrays in --rfj output, not just an array of lines.",
         type: "boolean",
         defaultValue: false,
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_JES2: ICommandOptionDefinition = {
-        name: "jes2",
-        aliases: ["2"],
-        description: "Use the JES2 spooler instead of the default spooler.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_JES3: ICommandOptionDefinition = {
-        name: "jes3",
-        aliases: ["3"],
-        description: "Use the JES3 or JES3plus spooler instead of the default spooler.",
-        type: "boolean",
-        defaultValue: false,
-        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_SUBSYSTEM: ICommandOptionDefinition = {
-        name: "subsystem",
-        aliases: ["subsys", "ss"],
-        description: "Specify the JES spooler system to use instead of the default spooler.",
-        type: "string",
-        defaultValue: false,
-        group: EjesSession.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_LOGSYS: ICommandOptionDefinition = {
-        name: "logsys",
-        aliases: ["l"],
-        description: "Specify a syslog to display by specifying the MVS name of a system in a JES2 environment.  The current system is browsed by default.",
-        type: "string",
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_SYSLOG: ICommandOptionDefinition = {
-        name: "syslog",
-        aliases: ["sys"],
-        description: "Display the SYSLOG instead of the default log.",
-        type: "boolean",
-        group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
-    };
-
-    public static EJES_OPTION_OPERLOG: ICommandOptionDefinition = {
-        name: "operlog",
-        aliases: ["oper"],
-        description: "Display the OPERLOG instead of the default log.",
-        type: "boolean",
         group: EjesProfile.EJES_RUNTIME_OPTION_GROUP
     };
 
@@ -238,12 +190,6 @@ export class EjesSession extends Session {
         EjesSession.EJES_OPTION_TIMER_INTERVAL,
         EjesSession.EJES_OPTION_DEBUG,
         EjesSession.EJES_OPTION_DETAILED_JSON,
-        EjesSession.EJES_OPTION_JES2,
-        EjesSession.EJES_OPTION_JES3,
-        EjesSession.EJES_OPTION_SUBSYSTEM,
-        EjesProfile.EJES_OPTION_OPERLOG,
-        EjesProfile.EJES_OPTION_SYSLOG,
-        EjesProfile.EJES_OPTION_LOGSYS
     ];
 
 
@@ -265,24 +211,15 @@ export class EjesSession extends Session {
         session.subsystem = params.arguments.subsystem ? params.arguments.subsystem.toUpperCase() : params.arguments.jes2 ? "JES2" : params.arguments.jes3 ? "JES3" : undefined;
 
         if ( params.arguments.debug & session.DEBUG_HOUSEKEEPING ) {
-            session.log("          params.arguments.protocol: " + params.arguments.protocol);
-            session.log("              params.arguments.host: " + params.arguments.host);
-            session.log("              params.arguments.port: " + params.arguments.port);
-            session.log("              params.arguments.user: " + params.arguments.user);
-            session.log("          params.arguments.password: " + params.arguments.password);
-            session.log("params.arguments.rejectUnauthorized: " + params.arguments.rejectUnauthorized);
-            session.log("         params.arguments.base-path: " + params.arguments.basePath);
-            session.log("        params.arguments.enum-value: " + params.arguments.enumValue);
-            session.log("    params.arguments.timer-interval: " + params.arguments.timerInterval);
-            session.log("             params.arguments.debug: " + params.arguments.debug);
-            session.log("      params.arguments.detailedjson: " + params.arguments.detailedjson);
-            session.log("              params.arguments.jes2: " + params.arguments.jes2);
-            session.log("              params.arguments.jes3: " + params.arguments.jes3);
-            session.log("         params.arguments.subsystem: " + params.arguments.subsystem);
-            session.log("           params.arguments.nonstop: " + params.arguments.nonstop);
-            session.log("             params.arguments.first: " + params.arguments.first);
-            session.log("              params.arguments.last: " + params.arguments.last);
-            session.log("               params.arguments.all: " + params.arguments.all);
+            const list = [];
+            for (const key in params.arguments)
+                if ( params.arguments.hasOwnProperty(key) && key !== "password" && key !== "pass" && key !== "pw" )
+                    list.push((key + ": ").padEnd(21, " ") + util.inspect(params.arguments[key], true, 2, false));
+            session.log("ZOWE PARAMETER LIST  Options not in list did not appear on the command line and are \"undefined\".  Passwords are stripped.");
+            session.log("-------------------  ---------------");
+            session.log("Option               Value");
+            session.log("-------------------  ---------------");
+            list.sort().forEach((item) => session.log(item));
         }
 
         return session;
@@ -294,12 +231,27 @@ export class EjesSession extends Session {
     public DEBUG_ANY_RESPONSE = 6;
     public DEBUG_HOUSEKEEPING = 8;
     public DEBUG_RECORD_INFO = 16;
-    public DEBUG_FETCH_METADATA = 32;
+    public DEBUG_NOTIFICATIONS = 32;
+    public DEBUG_FETCH_METADATA = 64;
 
     public columns = 240;
     public rows = 63;
-    public initialEnumeration = -1; // Will fetch all of the initial enumeration, which will be one screen's worth.
+    public initialEnumeration = 53; // Will fetch all of the initial enumeration, which will be one screen's worth.
+    public emptyEnumeration = 0;    // Fetch no lines.
+    public resultEnumeratedDataExhausted = 4;
+    public resultErrorCode = 8;
+    public resultServiceFailureOrTeminateSuccess = 12;
+    public reasonEndOfData = 1;
+    public reasonMoreDataPossible = 0;
+    public resultSuccessfulCompletion = 0;
     public subsystem = undefined;
+    public errorOnTerm150 = 150;
+    public errorOnExec151 = 151;
+    public errorOnInit152 = 152;
+    public errorRestApiFailure153 = 153; // Return code > 4.
+    public errorDuringMatchProcessing154 = 154;
+    public infoRefreshDurationExceeded155 = 155;
+
 
     private params: IHandlerParameters;
     private logger: IHandlerResponseConsoleApi;

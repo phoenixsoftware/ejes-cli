@@ -1,6 +1,6 @@
 {
   "name": "@phoenixsoftware/ejes-cli",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "(E)JES RESTapi Manager for Zowe",
   "homepage": "https://github.com/phoenixsoftware/ejes-cli#readme",
   "bugs": {
@@ -23,8 +23,11 @@
     "lib"
   ],
   "scripts": {
+    "psi_build_fast": "echo [psi_build_fast] Beginning installation. && npm run lint && npm install --audit false && npm run clean && tsc && zowe plugins install . && echo [psi_build_fast] Build complete.",
     "psi_build": "echo [psi_build] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes && echo [psi_build] Build complete.",
     "lint": "tslint \"src/**/*.ts\"",
+    "psi_build_webHelp_fast": "echo [psi_build_webHelp_fast] Beginning installation. && npm run lint && npm install --audit false && npm run clean && tsc && zowe plugins install . && webhelp && echo [psi_build_webHelp_fast] Build complete.",
+    "webHelp_compile_run": "webhelp",
     "psi_activateEjes_from_libEjes": "echo [psi_activateEjes_from_libEjes] Activating EJES in the project libEjes directory... && cd libEjes && echo [psi_activateEjes_from_libEjes] libEjes Directory: && cd && npm link . && cd .. && cd && echo [psi_activateEjes_from_libEjes] EJES activated from the project libEjes directory.",
     "psi_deactivateEjes_from_libEjes": "echo [psi_deactivateEjes_from_libEjes] Deactivating EJES in project libEjes directory && cd libEjes && echo [psi_deactivateEjes_from_libEjes] libEjes Directory: && cd && npm unlink . && cd .. && echo [dectivateEjesDev] ejesRM Directory: && cd && echo [dectivateEjesDev] EJES deactivated in the project libEjes.",
     "psi_build_and_test": "echo [psi_build_test] Beginning installation. && npm run lint && npm install && npm run clean && npm run vanillaBuild && zowe plugins install . && npm run psi_deactivateEjes_from_libEjes && npm run psi_activateEjes_from_libEjes_test && echo [psi_build_test] Test Zowe plugin... && zowe ejes query st -V  && echo [psi_build_test] Build complete.",
@@ -44,18 +47,18 @@
     "configurationModule": "lib/imperative.js"
   },
   "dependencies": {
-    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.22"
+    "@phoenixsoftware/ejes-restapi-node-clis": "^0.2.23"
   },
   "peerDependencies": {
-    "@zowe/cli": "^6.13.0",
-    "@zowe/imperative": "^4.6.2"
+    "@zowe/cli": "^6.32.0",
+    "@zowe/imperative": "^4.13.1"
   },
   "devDependencies": {
     "@types/jest": "^20.0.5",
     "@types/node": "^8.10.59",
     "@types/yargs": "8.0.2",
-    "@zowe/cli": "^6.13.0",
-    "@zowe/imperative": "^4.6.2",
+    "@zowe/cli": "^6.32.0",
+    "@zowe/imperative": "^4.13.1",
     "env-cmd": "^8.0.2",
     "fs-extra": "^5.0.0",
     "rimraf": "^2.7.1",
@@ -65,6 +68,6 @@
     "typescript": "3.9.2",
     "uuid": "^3.4.0"
   },
-  "author": "Phoenix Software International.",
+  "author": "Robert Blum Sr Programmer at Phoenix Software International.",
   "license": "EPL-2.0"
 }

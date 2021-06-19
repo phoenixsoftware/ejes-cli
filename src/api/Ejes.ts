@@ -22,23 +22,23 @@ export class Ejes {
 
     public static init(session: EjesSession, ip: object, ep: object, debug: number = 0): Promise<IEjes> {
         const payload = JSON.stringify({ initParms: ip, execParms: ep });
-        if ( debug & (session.DEBUG_REQUEST | session.DEBUG_FETCH_METADATA) ) { session.log("*** DEBUG *** Ejes:init - Request data=" + payload + ", Query=" + Ejes.EJES_INIT); }
+        if ( debug & (session.DEBUG_REQUEST | session.DEBUG_FETCH_METADATA) ) { session.log("*** DEBUG *** [" + (new Date()).valueOf() + "] Ejes:init - Request data=" + payload + ", Query=" + Ejes.EJES_INIT); }
         return RestClient.postExpectJSON<IEjes>(session, Ejes.EJES_INIT, [], payload );
     }
 
     public static cancelDownload(session: EjesSession, debug: number = 0): Promise<IEjes> {
-        if ( debug & session.DEBUG_REQUEST ) { session.log("*** DEBUG *** Ejes:cancelDownload - No request data.  Query=" + Ejes.EJES_CANCEL_DOWNLOAD); }
+        if ( debug & session.DEBUG_REQUEST ) { session.log("*** DEBUG *** [" + (new Date()).valueOf() + "] Ejes:cancelDownload - No request data.  Query=" + Ejes.EJES_CANCEL_DOWNLOAD); }
         return RestClient.postExpectJSON<IEjes>(session, Ejes.EJES_CANCEL_DOWNLOAD);
     }
 
     public static exec(session: EjesSession, ep: object, debug: number = 0): Promise<IEjes> {
         const payload = JSON.stringify({ execParms: ep });
-        if ( debug & (session.DEBUG_REQUEST | session.DEBUG_FETCH_METADATA) ) { session.log("*** DEBUG *** Ejes:exec - Request data=" + payload + ", Query = " + Ejes.EJES_EXEC); }
+        if ( debug & (session.DEBUG_REQUEST | session.DEBUG_FETCH_METADATA) ) { session.log("*** DEBUG *** [" + (new Date()).valueOf() + "] Ejes:exec - Request data=" + payload + ", Query = " + Ejes.EJES_EXEC); }
         return RestClient.postExpectJSON<IEjes>(session, Ejes.EJES_EXEC, [], payload );
     }
 
     public static term(session: EjesSession, debug: number = 0): Promise<IEjes> {
-        if ( debug & session.DEBUG_REQUEST ) { session.log("*** DEBUG *** Ejes:term - No Request Data.  Query=" + Ejes.EJES_TERM); }
+        if ( debug & session.DEBUG_REQUEST ) { session.log("*** DEBUG *** [" + (new Date()).valueOf() + "] Ejes:term - No Request Data.  Query=" + Ejes.EJES_TERM); }
         return RestClient.postExpectJSON<IEjes>(session, Ejes.EJES_TERM);
     }
 }

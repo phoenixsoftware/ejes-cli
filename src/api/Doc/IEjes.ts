@@ -88,17 +88,20 @@ export interface IScreen {
 }
 
 export interface IEjes {
-    screen?: IScreen;
-    function?: IFunction;
-    position?: IPosition;
-    notice?: INotice;
+    count?: number;
+    elapsed?: string;
+    error?: string;
     find?: FindInfoArray;
+    function?: IFunction;
+    isVerticalAdjustment?: boolean;
     lines?: [string];
     loginfo?: LogInfoArray;
     message?: IMessage;
+    notice?: INotice;
+    position?: IPosition;
+    screen?: IScreen;
     status?: number;
     statusMessage?: string;
-    elapsed?: string;
-    returnCode?: number;
     reasonCode?: number;
+    returnCode?: number;
 }

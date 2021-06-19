@@ -80,15 +80,19 @@ export function addShared(x: Idef) {
       aliases:     ["i"],
       description: "Specify host activity timeout in minutes (starts set to 2)."
     }, {
-      name: "jes2",
-      type: "boolean",
-      aliases: ["2"],
+      name:        "jes2",
+      type:        "boolean",
+      aliases:      ["2"],
       description: "Use the JES2 spooler instead of the default spooler."
     }, {
-      name: "jes3",
-      type: "boolean",
-      aliases: ["3"],
+      name:        "jes3",
+      type:        "boolean",
+      aliases:     ["3"],
       description: "Use the JES3 or JES3plus spooler instead of the default spooler."
+    }, {
+      name:        "subsystem",
+      type:        "string",
+      description: "Name of the spooler to use instead of the default spooler."
     }, {
       name:        "screen",
       description: "Display host screen output to stderr.  Off by default.  Specify with no argument to turn on.",

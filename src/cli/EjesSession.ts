@@ -114,7 +114,7 @@ export class EjesSession extends Session {
     public static EJES_OPTION_COLOR_SCHEME: ICommandOptionDefinition = {
         name: "color-scheme",
         aliases: ["scheme", "cs"],
-        description: "Accessibility option: Specify the name of a color scheme.  User scheme files may also be created and specified to provide better contrast or to favor easier to see colors.  For a how-to, use \"zowe ejes emulate batch --helpApp scheme-info\"\n\nAllowed values: dark, light, powershell, nono, none, user-scheme-file, list, help",
+        description: "Accessibility option: Specify the name of a color scheme.  User scheme files may also be created and specified to provide better contrast or to favor easier to see colors.  For a how-to, use \"zowe ejes emulate batch --helpApp scheme-info\".  Zowe ejes log stream ignores this option as it outputs plain text by default, only colorizing when ANSI color options are specified.\n\nAllowed values: dark, light, powershell, nono, none, user-scheme-file, list, help",
         type: "string",
         defaultValue: "dark",
         group: EjesSession.EJES_CONNECTION_OPTION_GROUP
@@ -137,7 +137,7 @@ export class EjesSession extends Session {
      */
     public static EJES_OPTION_TIMER_INTERVAL: ICommandOptionDefinition = {
         name: "refresh-interval",
-        aliases: ["refreshInterval", "refresh", "ri"],
+        aliases: ["refreshInterval", "refresh", "ri", "sleep-interval", "sleep", "s"],
         description: "Number of seconds between (E)JES API calls in log stream command.  The actual minimum and maximum interval is controlled by your host refresh command settings.",
         type: "number",
         defaultValue: 5,
@@ -251,6 +251,7 @@ export class EjesSession extends Session {
     public errorRestApiFailure153 = 153; // Return code > 4.
     public errorDuringMatchProcessing154 = 154;
     public infoRefreshDurationExceeded155 = 155;
+    public errorFindStringNotFound156 = 156;
 
 
     private params: IHandlerParameters;
@@ -275,17 +276,17 @@ export class EjesSession extends Session {
     }
 
     public storeCookie(cookie: any) {
-        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  storeCookie has been invoked.");
-        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  ISession.tokenType: " + this.ISession.tokenType);
+        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG *** [" + (new Date()).valueOf() + "] storeCookie has been invoked.");
+        this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG *** [" + (new Date()).valueOf() + "] ISession.tokenType: " + this.ISession.tokenType);
 
         const headerKeys: string[] = Object.keys(cookie);
         headerKeys.forEach((key) => {
             const auth = cookie[key] as string;
             const authArr = auth.split(";");
-            this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  key: " + key + ", auth: " + auth);
+            this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG *** [" + (new Date()).valueOf() + "] key: " + key + ", auth: " + auth);
             // see each field in the cookie, e/g. Path=/; Secure; HttpOnly; LtpaToken2=...
             authArr.forEach((element: string) => {
-                this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
+                this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG *** [" + (new Date()).valueOf() + "] element: " + element + ",  tokenType: " + element.indexOf(this.ISession.tokenType));
                 // if we match requested token type, save it off for its length
                 if ( element.indexOf(this.ISession.tokenType) === 0 ) {
                     // parse off token value, minus LtpaToken2= (as an example)
@@ -296,7 +297,7 @@ export class EjesSession extends Session {
                     }
                     else
                         this.ISession.tokenValue = "";
-                    this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG ***  tokenType: " + this.ISession.tokenType + ", tokenValue: " + this.ISession.tokenValue);
+                    this.debugLog(this.DEBUG_HOUSEKEEPING, "*** DEBUG *** [" + (new Date()).valueOf() + "] tokenType: " + this.ISession.tokenType + ", tokenValue: " + this.ISession.tokenValue);
                 }
             });
         });

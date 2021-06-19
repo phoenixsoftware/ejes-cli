@@ -15,8 +15,8 @@ import { EjesSession } from "../EjesSession";
 
 const LogDefinition: ICommandDefinition = {
     name: "log",
-    summary: "- Stream syslog/operlog to stdout.",
-    description: "Stream syslog/operlog to stdout.",
+    summary: "- Output syslog/operlog to stdout.",
+    description: "Output the tail end of the host log to stdout, optionally streaming new records.  Positioning, searching, and limiting options are supported, including specifying which log type and what system.",
     type: "group",
     children: [ StreamDefinition ],
     pluginHealthCheck: "./lib/healthCheck.handler",

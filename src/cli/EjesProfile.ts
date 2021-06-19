@@ -112,7 +112,7 @@ export class EjesProfile extends Session {
     public static EJES_OPTION_COLOR_SCHEME: ICommandOptionDefinition = {
         name: "color-scheme",
         aliases: ["scheme", "cs"],
-        description: "Accessibility option: Specify the name of a color scheme.  User scheme files may also be created and specified to provide better contrast or to favor easier to see colors.  For a how-to, use \"zowe ejes emulate batch --helpApp scheme-info\"\n\nAllowed values: dark, light, powershell, nono, none, user-scheme-file, list, help",
+        description: "Accessibility option: Specify the name of a color scheme.  User scheme files may also be created and specified to provide better contrast or to favor easier to see colors.  For a how-to, use \"zowe ejes emulate batch --helpApp scheme-info\".  Zowe ejes log stream ignores this option as it outputs plain text by default, only colorizing when ANSI color options are specified.\n\nAllowed values: dark, light, powershell, nono, none, user-scheme-file, list, help",
         type: "string",
         defaultValue: "dark",
         group: EjesProfile.EJES_CONNECTION_OPTION_GROUP
@@ -135,7 +135,7 @@ export class EjesProfile extends Session {
      */
     public static EJES_OPTION_TIMER_INTERVAL: ICommandOptionDefinition = {
         name: "refresh-interval",
-        aliases: ["refreshInterval", "refresh", "ri"],
+        aliases: ["refreshInterval", "refresh", "ri", "sleep-interval", "sleep", "s"],
         description: "Number of seconds between (E)JES API calls in log stream command.  The actual minimum and maximum interval is controlled by your host refresh command settings.",
         type: "number",
         defaultValue: 5,

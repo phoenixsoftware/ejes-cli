@@ -34,6 +34,7 @@ export const SystemCommandDefinition: ICommandDefinition = {
       { name: "jes2",       type: "boolean", aliases: ["2"],   description: "Use the JES2 spooler instead of the default spooler." },
       { name: "jes3",       type: "boolean", aliases: ["3"],   description: "Use the JES3 or JES3plus spooler instead of the default spooler." },
       { name: "lines",      type: "string",  aliases: ["y"],   description: "Maximum lines in a table or report.  [1000 | tty-default | number | all]" },
+      { name: "subsystem",  type: "string",                    description: "Name of the spooler to use instead of the default spooler." },
       { name: "width",      type: "string",  aliases: ["x"],   description: "Maximum characters per line or row.  [tty-default | number | all]" },
     ],
     examples: [{

@@ -82,6 +82,9 @@ export interface IFunction {
     currentRowKey?: string;
 }
 
+export interface IArgument {
+    isTimeArgument?: boolean;
+}
 
 export interface IScreen {
     screenImage: [[]];
@@ -89,8 +92,10 @@ export interface IScreen {
 
 export interface IEjes {
     count?: number;
+    data?: any;
     elapsed?: string;
     error?: string;
+    exitCode?: number;
     find?: FindInfoArray;
     function?: IFunction;
     isVerticalAdjustment?: boolean;
@@ -99,6 +104,7 @@ export interface IEjes {
     message?: IMessage;
     notice?: INotice;
     position?: IPosition;
+    success?: boolean;
     screen?: IScreen;
     status?: number;
     statusMessage?: string;

@@ -12,7 +12,7 @@ import { ICommandDefinition } from "@zowe/imperative";
 import { CmdstackDefinition } from "./cmdstack/Cmdstack.definition";
 import { NOPDefinition } from "./nop/NOP.definition";
 import { ShellDefinition } from "./shell/Shell.definition";
-import { ActivityDefinition, APFdsDefinition, CLassDefinition, CommandDefinition, DJcDefinition, DYNEXitDefinition, ENClaveDefinition, ENQDefinition, ENQCDefinition, ENQDDefinition, EntryDefinition, FSSDefinition, GRoupDefinition, HCheckDefinition, HoldDefinition, INITDefinition, InputDefinition, JESplexDefinition, JGroupDefinition, LIneDefinition, LNKlstDefinition, LPAlstDefinition, LogDefinition, MDsDefinition, MEMUsageDefinition, MenuDefinition, MOuntsDefinition, NETConnDefinition, NETSERVDefinition, NJEDefinition, NOdeDefinition, OFFloadDefinition, OutputDefinition, PAGedsDefinition, PARMlibDefinition, PRinterDefinition, PROClibDefinition, PStatusDefinition, QueryDefinition, RESMonDefinition, RESOurceDefinition, SCHenvDefinition, SessionDefinition, SPArtDefinition, SPVolDefinition, StatusDefinition, SYMbolDefinition, SYSClsDefinition, SYSplexDefinition, SYSReqDefinition, UlogDefinition, WriterDefinition, ZeroDefinition
+import { ActivityDefinition, APFdsDefinition, CLassDefinition, CommandDefinition, DJcDefinition, DYNEXitDefinition, ENClaveDefinition, ENQDefinition, ENQCDefinition, ENQDDefinition, EntryDefinition, FSSDefinition, GRoupDefinition, HCheckDefinition, HoldDefinition, INITDefinition, InputDefinition, JESplexDefinition, JGroupDefinition, LIneDefinition, LNKlstDefinition, LPAlstDefinition, LogDefinition, MDsDefinition, MEMUsageDefinition, MenuDefinition, MOuntsDefinition, NETConnDefinition, NETSERVDefinition, NJEDefinition, NOdeDefinition, OFFloadDefinition, OutputDefinition, PAGedsDefinition, PARMlibDefinition, PRinterDefinition, PROClibDefinition, PStatusDefinition, QueryDefinition, RESMonDefinition, RESOurceDefinition, SCHenvDefinition, SessionDefinition, SPArtDefinition, SPVolDefinition, StatusDefinition, SUBSYStemDefinition, SYMbolDefinition, SYSClsDefinition, SYSplexDefinition, SYSReqDefinition, UlogDefinition, WriterDefinition, ZeroDefinition
 } from "./display/display.definition";
 import { EjesProfile } from "../EjesProfile";
 
@@ -20,7 +20,7 @@ const BatchDefinition: ICommandDefinition = {
     children: [CmdstackDefinition, ShellDefinition,
         ActivityDefinition, APFdsDefinition, CLassDefinition, CommandDefinition, DJcDefinition, DYNEXitDefinition, ENClaveDefinition, ENQDefinition, ENQCDefinition, ENQDDefinition, EntryDefinition, FSSDefinition, GRoupDefinition, HCheckDefinition, HoldDefinition, INITDefinition, InputDefinition, JESplexDefinition, JGroupDefinition, LIneDefinition, LNKlstDefinition, LPAlstDefinition, LogDefinition, MDsDefinition, MEMUsageDefinition, MenuDefinition, MOuntsDefinition,
         NETConnDefinition, NETSERVDefinition, NJEDefinition, NOdeDefinition, NOPDefinition, OFFloadDefinition, OutputDefinition, PAGedsDefinition, PARMlibDefinition, PRinterDefinition, PROClibDefinition, PStatusDefinition, QueryDefinition, RESMonDefinition, RESOurceDefinition, SCHenvDefinition, SessionDefinition, SPArtDefinition, SPVolDefinition,
-        StatusDefinition, SYMbolDefinition, SYSClsDefinition,
+        StatusDefinition, SUBSYStemDefinition, SYMbolDefinition, SYSClsDefinition,
         SYSplexDefinition, SYSReqDefinition, UlogDefinition, WriterDefinition, ZeroDefinition
     ],
     name: "batch",

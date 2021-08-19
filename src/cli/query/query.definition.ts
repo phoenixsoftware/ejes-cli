@@ -1283,6 +1283,37 @@ const StatusDefinition: ICommandDefinition = {
         handler: __dirname + "/generic.handler"
     };
 
+const SUBSYStemDefinition: ICommandDefinition = {
+    name: "subsys",
+    aliases: ["subsy", "subs"],
+    summary: " - MVS Sysplex Subsystems",
+    description: "Select a table of all the MVS subsystems defined to the systems in your sysplex.\n\nUse  Primary Selection options to modify which rows are included in a table (for example, --sysnames sys* includes only systems starting with \"sys\").  Use General Use options to narrow your selected rows further.  Use --command to issue commands against the rows included in the table.",
+    type: "command",
+    examples: [{
+        description: "List the selection columns available for this table.\n\n" +
+        "The \"list\" argument may be used on any option.  A descriptive table for that " +
+        "option will be displayed and any other work will stop.  The table " +
+        "may display available columns or positional " +
+        "input fields depending on the option." +
+        "\n\n  Example",
+        options: "--select list"
+    }, {
+        description: "Provide detailed help for the metafilter option.\n\n" +
+            "  The \"help\" argument may be used on any option.  " +
+            "  Help for the option will be displayed and any other work will stop." +
+            "\n\n  Example",
+        options: "--metafilter help"
+    }],
+    positionals: [
+    {
+        name: "parameter-list",
+        type: "string",
+        description: "Optional list enclosed in double-quotes.  May contain invocation primary selection criteria.  See the (E)JES Reference Manual for information for the corresponding command for details about content and the list's internal order.",
+        required: false
+    }],
+    handler: __dirname + "/generic.handler"
+};
+
 // import { SYMbolDefinition } from "./SYMbol/SYMbol.definition";
 const SYMbolDefinition: ICommandDefinition = {
         name: "symbol",
@@ -1545,6 +1576,7 @@ const QueryDefinition: ICommandDefinition = {
                SPArtDefinition,
                SPVolDefinition,
                StatusDefinition,
+               SUBSYStemDefinition,
                SYMbolDefinition,
                SYSClsDefinition,
                SYSplexDefinition,

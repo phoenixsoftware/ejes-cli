@@ -465,6 +465,16 @@ export const StatusDefinition: ICommandDefinition = {
 };
 addShared({ obj: StatusDefinition, primary: true});
 
+export const SUBSYStemDefinition: ICommandDefinition = {
+  name:        "subsys",
+  aliases:     ["subsy", "subs"],
+  summary:     "* Display MVS subsystems.",
+  description: "Display a table of all the MVS subsystems defined to the systems in your sysplex" + common,
+  type:        "command",
+  handler:     __dirname + "/../Batch.handler",
+};
+addShared({ obj: SUBSYStemDefinition, primary: true});
+
 export const SYMbolDefinition: ICommandDefinition = {
   name:        "symbol",
   aliases:     ["sym"],

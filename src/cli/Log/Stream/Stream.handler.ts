@@ -11,10 +11,12 @@
 //  node --inspect-brk C:\Users\vssemc\AppData\Roaming\npm\node_modules\@zowe\core\lib\main.js
 
 import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
-import { IEjes } from "../../../api/Doc/IEjes";
+import { IArgument, IEjes } from "../../../api/Doc/IEjes";
 import { Ejes } from "../../../api/Ejes";
 import { EjesSession } from "../../EjesSession";
 import * as util from "util";
+import { SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION } from "constants";
+import { throws } from "assert";
 
 export default class ListHandler implements ICommandHandler {
 
@@ -23,7 +25,7 @@ export default class ListHandler implements ICommandHandler {
 
     public async process(params: IHandlerParameters): Promise<void> {
 
-        const ejesVersion = "EJES Log Stream V1.1.0, a Zowe component of (E)JES";
+        const ejesVersion = "EJES Log Stream V1.1.1, a Zowe component of (E)JES";
         const linesDefault = 10;
         const last = { blockId: undefined, recordId: undefined, numberOfLines: undefined };
         const cmdPrimary = [""];
@@ -67,6 +69,7 @@ export default class ListHandler implements ICommandHandler {
         let sep : boolean;
         let findSepRequestNumber : number;
         let evContext : number;
+        let needToCountUp : boolean;
 
         /* Functions */
 
@@ -85,9 +88,10 @@ export default class ListHandler implements ICommandHandler {
                 catch (err) { this.session.error("Error writing .\\ejesLogStreamTerminationDiagnostics.txt: " + util.inspect(err)); }
                 if ( ! reason ) {
                     reasonReturn(true, "Exception during host termination request.  Can be ignored.  Diagnostics in ejesLogStreamTerminationDiagnostics.txt.");
+                params.response.data.setMessage(reason);
                 params.response.data.setExitCode(this.session.errorOnTerm150);
                 process.exitCode = this.session.errorOnTerm150;
-            }
+                }
             }
         };
 
@@ -97,13 +101,15 @@ export default class ListHandler implements ICommandHandler {
                 parm[0] = parm[0].replace(/^next/, "+").replace(/^prev/, "-");
         };
 
-        const messageFilterOptionParse = (option: string, model: string[], fieldLength: number) => {
+        const messageFilterOptionParse = (option: string, model: string[], fieldLength: number, flags?: IArgument) => {
             const parm: string[] = params.arguments[option];
             let list = "";
             let captureEndOfLastRealData = false;
             model.forEach((value, index) => {
                 countParsed++;
                 value = (parm && index < parm.length) ? parm[index] : value;
+                if ( flags && flags.isTimeArgument && value.length > 10 && value.indexOf(":") === 10 )
+                    value = value.substr(8, 8) + ":" + value.substr(17, 2) + "-"  + value.substr(0, 4) + "." + value.substr(4, 3);
                 if ( value !== model[index] )
                     captureEndOfLastRealData = true;
                 list += /* (index > 0 ? "," : "" ) + */ "<" + (value ? ("'" + (value.length > fieldLength ? value.substring(0, fieldLength) : value) + "'") : "")  + ">";
@@ -210,7 +216,7 @@ export default class ListHandler implements ICommandHandler {
                 if ( ! process.env.EJES_LOG_CLI_NO_BOTTOM && (! noBottomOfDataIfAtLinesMax || limitLinesMax === undefined || linesActuallyOutput < limitLinesMax) ) {
                     linesActuallyOutput++;
                     this.session.log(" ".repeat(bodPad) + "*".repeat((outputRecordLength - 15) / 2) + " Bottom of Data " + "*".repeat((outputRecordLength - 15) / 2));
-            }
+                }
             }
             return bod;
         };
@@ -340,27 +346,30 @@ export default class ListHandler implements ICommandHandler {
                     }
                 }
                 catch (e) {
+                    params.response.data.setExitCode(process.exitCode = ip ? this.session.errorOnInit152 : this.session.errorOnExec151);
                     let msg = "Exception during host " + (ip ? "initialization" : "execution") + " request.";
                     try { require("fs").writeFileSync(".\\ejesLogStreamDiagnostics.txt", util.inspect(e, this.inspectOptions())); }
                     catch (err) { this.session.error("Error writing .\\ejesLogStreamDiagnostics.txt: " + util.inspect(err)); }
-                    if (params.arguments.rfj)
-                            params.response.data.setObj(e, true);
-                    else {
                         try {
                         const x = JSON.parse(e.mDetails.causeErrors);
                         msg = (ip ? "Initialization" : "Execution") + " request: " + e.mDetails.msg + ". " + (x.errorMessage && x.errorMessage !== null ? x.errorMessage + ": " : "") + (x.statusMessage && x.statusMessage != null ? x.statusMessage + "." : "") + " Diagnostics in ejesLogStreamDiagnostics.txt.";
                     }
-                        catch (e2) {
-                            try {  msg = (ip ? "Initialization" : "Execution") + " request: " + e.mDetails.msg + ". " + (e.mDetails.causeErrors ? e.mDetails.causeErrors + "." : "") + " Diagnostics in ejesLogStreamDiagnostics.txt.";  }
-                            catch (e3) { this.session.error(verbose ? util.inspect(e, this.inspectOptions()) : msg + "  Diagnostics in ejesLogStreamDiagnostics.txt."); }
+                    catch (e2) {
+                        try {  msg = (ip ? "Initialization" : "Execution") + " request: " + e.mDetails.msg + ". " + (e.mDetails.causeErrors ? e.mDetails.causeErrors + "." : "") + " Diagnostics in ejesLogStreamDiagnostics.txt.";  }
+                        catch (e3) {
+                            this.session.error(verbose ? util.inspect(e, this.inspectOptions()) : msg + "  Diagnostics in ejesLogStreamDiagnostics.txt.");
                         }
+                    }
+                    params.response.data.setMessage(msg);
+                    if ( params.arguments.rfj ) {
+                        this.session.error(msg);
+                        (params.response as any).writeJsonResponse();
                     }
                     if ( ! reason )
                         reasonReturn(true, msg);
-                    if ( ! verbose )
+                    if ( ! verbose && ! params.arguments.rfj )
                         this.session.error(msg);
-                    params.response.data.setExitCode(ip ? this.session.errorOnInit152 : this.session.errorOnExec151);
-                    process.exit(ip ? this.session.errorOnInit152 : this.session.errorOnExec151); // The on.exit will send a logoff.
+                    process.exit(process.exitCode); // The on.exit will send a logoff.
                 }
                 this.debugMsg(this.session.DEBUG_FETCH_METADATA, "fetchData", "Reason: " + response.reasonCode + ", RC: " + response.returnCode + ", Iterations(enumeration): " + loopCount + "(" + countOfLinesOutput + "), Lines received: " + response.loginfo.length + ", Begin? " + (begin ? "True" : "False") + ", Msg: " + (response.message.longMessages.length > 0 ? response.message.longMessages : response.message.shortMessage ? response.message.shortMessage : "\"\""));
                 linesReceivedFromHost += response.lines.length;
@@ -385,8 +394,11 @@ export default class ListHandler implements ICommandHandler {
                             response.message.shortMessage = "String not found.";
                             response.returnCode = 8;
                             response.reasonCode = undefined;
-                            // if ( cmd.starts With("find") )
-                                break;
+                            break;
+                    }
+                    if ( needToCountUp ) { // Enumeration fix for message filtering lines < page
+                        response.lines.splice(0, response.lines.length  - limitLinesMax);
+                        bod = true; // This will always be at the end of the log.
                     }
                 }
                 begin = false;
@@ -530,7 +542,7 @@ export default class ListHandler implements ICommandHandler {
                 const ejes = response.message.longMessages.length > 0 ? parseInt(response.message.longMessages[0].substr(4), 10) : 0;
                 if ( response.message.longMessages.length > 0 && (ejes === 157 || ejes === 158) )
                     response.message.longMessages[0] = response.message.longMessages[0].slice(0, response.message.longMessages[0].indexOf(",")) + ".  String not found.";
-                const t = (response.message.longMessages.length > 0 ? response.message.longMessages : response.message.shortMessage);
+                const t = (response.message.longMessages.length > 0 ? response.message.longMessages[0] : response.message.shortMessage);
                 errorExitDiagnostics =
                     "\n  Error reported by RESTAPI: " + t +
                     "\n  Response Return Code:      " + response.returnCode +
@@ -539,10 +551,14 @@ export default class ListHandler implements ICommandHandler {
                     "\n  Iteration:                 " + loopCount +
                     "\n  Enumeration:               " + countOfLinesOutput +
                     "\n  ---------------------------";
-                if ( ! verbose )
+                if ( ! verbose || params.arguments.rfj )
                     this.session.error("(E)JES Error Reported by RESTAPI: " + t + " (rc=" + response.returnCode + ", rsn=" + response.reasonCode + ")");
-                params.response.data.setExitCode(this.session.errorRestApiFailure153);
-                process.exit(ejes === 144 || ejes === 157 || ejes === 158 ? this.session.errorFindStringNotFound156 : this.session.errorRestApiFailure153); // The on.exit will send a logoff.
+                process.exitCode = (ejes === 144 || ejes === 157 || ejes === 158 ? this.session.errorFindStringNotFound156 : this.session.errorRestApiFailure153);
+                params.response.data.setExitCode(process.exitCode);
+                params.response.data.setMessage(t);
+                if (params.arguments.rfj)
+                    (params.response as any).writeJsonResponse();
+                process.exit(process.exitCode); // The on.exit will send a logoff.
             }
             if ( ! params.arguments.follow || params.arguments.rfj ) {
                 if ( params.arguments.rfj )
@@ -638,8 +654,8 @@ export default class ListHandler implements ICommandHandler {
         messageFilterOptionParse("messageText", [""], 34);
         messageFilterOptionParse("routingCodes", ["ALL"], 34);
         messageFilterOptionParse("descriptorCodes", ["ALL"], 34);
-        messageFilterOptionParse("windowTop", [""], 23);
-        messageFilterOptionParse("windowBottom", [""], 23);
+        messageFilterOptionParse("windowTop", [""], 23, {isTimeArgument: true});
+        messageFilterOptionParse("windowBottom", [""], 23, {isTimeArgument: true});
         messageFilterOptionParse("mpfExitFlags", ["FFFFFFFF"], 8);
         messageFilterOptionParse("resultDirective", ["NZ"], 2);
         if ( endIndexOvertypes !== undefined )
@@ -663,7 +679,7 @@ export default class ListHandler implements ICommandHandler {
             cmdPrimary[cmdIndex] += "loc " + (params.arguments.head || params.arguments.line.length === 0 ? "1" : params.arguments.line[0]);
         if ( params.arguments.time ) {
             if ( params.arguments.time.length === 0 ||  params.arguments.time[0] !== "?" ) {
-                const t = params.arguments.time[0];
+                const t = params.arguments.time[0];  // NB: Can be "undefined".
                 const colon = t ? t.indexOf(":") : 2;
                 if ( colon !== 2 )
                     switch (colon) {
@@ -728,13 +744,14 @@ export default class ListHandler implements ICommandHandler {
                 Math.max(--limitLinesMax, 0);
                 noBottomOfDataIfAtLinesMax = false;
             }
-
             if ( params.arguments.rfj )
                 params.arguments.enumValue = count = limitLinesMax;
             let factor = (expectingSyslog ? 2 : 1) + count - limitLinesMax;
-            if ( factor > 0 )
-                positioningForEnumeration = "bot;down " + factor;
-            else  {
+            if ( factor > 0 ) { // Test for last page.  Last page position/count unknowable on OPERLOG.
+                positioningForEnumeration = "bot";   // Whether on OPERLOG or SYSLOG  unknownable at this point.
+                needToCountUp = true;  // Must enumerate last page then discard unneed lines to get last n lines.
+            }
+            else  { // We can try to enumerate precisely otherwise.
                 factor = limitLinesMax - count - (expectingSyslog ? 2 : 1);
                 if ( factor > 0 )
                     positioningForEnumeration = "bot;up " + factor;

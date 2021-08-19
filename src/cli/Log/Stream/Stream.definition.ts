@@ -195,14 +195,14 @@ export const StreamDefinition: ICommandDefinition = {
                 aliases: ["windowBottom", "winBot", "wb", "bot", "high-time-date", "htd"],
                 description: "Filter OPERLOG by setting the time and optionally the date of the bottom of the log to use.  Up to 23 characters.\n\n      The boundary specifications may be either fixed time-date values, e.g.\"16:00:12:90-2021/02/12\" (see “Time-Date Values” in the (E)JES Reference) or calculated relative to the time stamp associated with the record shown at 57 lines from the bottom of the log at start-up.\n\n      A relative value is indicated by the presence of a next (+) or previous preceding the boundary specification, e.g., prev1h. After the next or previous you may specify either a number of seconds, minutes, hours, or days as indicated by using a 's', 'm', 'h', or 'd' suffix. Assumes 'h' if omitted.\n\n      Note: The response time can be seriously impacted by the use of filtering criteria that results in too few messages being considered for display.",
                 type: "array",
-                allowableValues: { values: ["^(\\+|next|prev)*(\\d+[smhd]{0,1})$|^(?:(\\d\\d\\:\\d\\d(?:\\:\\d\\d){0,2}(?:-(?:(?:\\d{4}[.-]\\d{3})|(?:\\d{4}(?:[\\/|-]\\d{2}){2})|(?:(?:\\d{2}[\\/|-]){2}\\d{4})))*){0,1}|\\?)$"], caseSensitive: false },
+                allowableValues: { values: ["^(\\+|next|prev)*(\\d+[smhd]{0,1})$|(?:^(20\\d{5}) ((\\d\\d:\\d\\d:\\d\\d.\\d\\d))$)|^(?:(\\d\\d\\:\\d\\d(?:\\:\\d\\d){0,2}(?:-(?:(?:\\d{4}[.-]\\d{3})|(?:\\d{4}(?:[\\/|-]\\d{2}){2})|(?:(?:\\d{2}[\\/|-]){2}\\d{4})))*){0,1}|\\?)$"], caseSensitive: false },
                 group: XSELECT_OPTIONS
             }, {
                 name: "window-top",
                 aliases: ["windowTop", "winTop", "wt", "top", "low-time-date", "ltd"],
                 description: "Filter OPERLOG by setting the time and optionally the date of the top of the log to use.  Up to 23 characters.\n\n      The boundary specifications may be either fixed time-date values, e.g.\"16:00:12:90-2021/02/12\" (see “Time-Date Values” in the (E)JES Reference) or calculated relative to the time stamp associated with the record shown at 57 lines from the bottom of the log at start-up.\n\n      A relative value is indicated by the presence of a next (+) or previous preceding the boundary specification, e.g., prev1h. After the next or previous you may specify either a number of seconds, minutes, hours, or days as indicated by using a 's', 'm', 'h', or 'd' suffix. Assumes 'h' if omitted.\n\n      Note: The response time can be seriously impacted by the use of filtering criteria that results in too few messages being considered for display.",
                 type: "array",
-                allowableValues: { values: ["^(\\+|next|prev)*(\\d+[smhd]{0,1})$|^(?:(\\d\\d\\:\\d\\d(?:\\:\\d\\d){0,2}(?:-(?:(?:\\d{4}[.-]\\d{3})|(?:\\d{4}(?:[\\/|-]\\d{2}){2})|(?:(?:\\d{2}[\\/|-]){2}\\d{4})))*){0,1}|\\?)$"], caseSensitive: false },
+                allowableValues: { values: ["^(\\+|next|prev)*(\\d+[smhd]{0,1})$|(?:^(20\\d{5}) ((\\d\\d:\\d\\d:\\d\\d.\\d\\d))$)|^(?:(\\d\\d\\:\\d\\d(?:\\:\\d\\d){0,2}(?:-(?:(?:\\d{4}[.-]\\d{3})|(?:\\d{4}(?:[\\/|-]\\d{2}){2})|(?:(?:\\d{2}[\\/|-]){2}\\d{4})))*){0,1}|\\?)$"], caseSensitive: false },
                 group: XSELECT_OPTIONS
             }, {
                 name: "mpf-exit-flags",

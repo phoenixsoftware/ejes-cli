@@ -12,13 +12,14 @@
  * It would be better if the imperative could accept a list of the displays
  * available to the user and translate to commands, but it doesn't work that way.
 */
-import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
+import { ICommandHandler, IHandlerParameters, ISession, ConnectionPropsForSessCfg } from "@zowe/imperative";
 //import { runEjesQuery } from "./ejes_query";
 import { runEjesApi } from "../../api/ejes_api";
 
 export default class GenericDisplayer implements ICommandHandler {
     public async process(params: IHandlerParameters): Promise<void> {
-        const profile = params.profiles.get("ejes");
+        const sessCfg: ISession = {};
+        const sessCfgWithCreds = ConnectionPropsForSessCfg.addPropsOrPrompt(sessCfg, params.arguments, { doPrompting: true, parms: params });
         try {
             runEjesApi(params);
         }

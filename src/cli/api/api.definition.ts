@@ -44,8 +44,8 @@ const CancelDownloadDefinition: ICommandDefinition = {
     ],
     examples: [{
         description: "Cancel a long running job.  Show the status in returned JSON." +
-"\n\n   Example",
-options: "--rfj --cookie \"EJESWEB_54761=DB856A...;path=/EjesWeb;Secure;HttpOnly\""
+        "\n\n   Example",
+        options: "--rfj --cookie \"EJESWEB_54761=DB856A...;path=/EjesWeb;Secure;HttpOnly\""
     }],
     handler: __dirname + "/generic.api.handler"
 };

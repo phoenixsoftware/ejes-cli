@@ -8,11 +8,13 @@
 * Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
-import { ICommandHandler, IHandlerParameters, Imperative, ImperativeError } from "@zowe/imperative";
+import { ICommandHandler, IHandlerParameters, ConnectionPropsForSessCfg, Imperative, ImperativeError } from "@zowe/imperative";
 import { runEjesQuery } from "../../../api/ejes_query";
 
 export default class SubmitCommandHandler implements ICommandHandler {
     public async process(params: IHandlerParameters): Promise<void> {
+        const sessCfg = {};
+        const sessCfgWithCreds = await ConnectionPropsForSessCfg.addPropsOrPrompt(sessCfg, params.arguments, { doPrompting: true, parms: params });
         try {
             runEjesQuery(params);
         }

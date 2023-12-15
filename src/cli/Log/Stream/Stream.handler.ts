@@ -10,7 +10,7 @@
 
 //  node --inspect-brk C:\Users\vssemc\AppData\Roaming\npm\node_modules\@zowe\core\lib\main.js
 
-import { ICommandHandler, IHandlerParameters } from "@zowe/imperative";
+import { ICommandHandler, IHandlerParameters, ISession, ConnectionPropsForSessCfg } from "@zowe/imperative";
 import { IArgument, IEjes } from "../../../api/Doc/IEjes";
 import { Ejes } from "../../../api/Ejes";
 import { EjesSession } from "../../EjesSession";
@@ -25,7 +25,7 @@ export default class ListHandler implements ICommandHandler {
 
     public async process(params: IHandlerParameters): Promise<void> {
 
-        const ejesVersion = "EJES Log Stream V1.1.1, a Zowe component of (E)JES";
+        const ejesVersion = "EJES Log Stream V2.0.0, a Zowe component of (E)JES";
         const linesDefault = 10;
         const last = { blockId: undefined, recordId: undefined, numberOfLines: undefined };
         const cmdPrimary = [""];

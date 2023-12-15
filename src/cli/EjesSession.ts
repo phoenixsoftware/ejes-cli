@@ -8,7 +8,7 @@
 * Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
-import { ICommandOptionDefinition, Session, ISession, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
+import { ICommandOptionDefinition, Session, ISession, ConnectionPropsForSessCfg, IHandlerParameters, IHandlerResponseConsoleApi } from "@zowe/imperative";
 import { Ejes } from "../api/Ejes";
 import { EjesProfile } from "./EjesProfile";
 import * as util from "util";
@@ -194,7 +194,9 @@ export class EjesSession extends Session {
 
 
     public static EjesSessionFactory(params: IHandlerParameters): EjesSession {
-        const profile = params.profiles.get("ejes");
+        // const profile = params.profiles.get("ejes");
+        const sessCfg: ISession = {};
+        const sessCfgWithCreds = ConnectionPropsForSessCfg.addPropsOrPrompt(sessCfg, params.arguments, { doPrompting: true, parms: params });
         const session = new EjesSession({
             protocol: params.arguments.protocol,
             type: "token",

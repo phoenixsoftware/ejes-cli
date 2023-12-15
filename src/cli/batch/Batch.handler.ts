@@ -8,7 +8,7 @@
 * Copyright (c) 2020-2021 Phoenix Software International, Inc.
 */
 
-import { ICommandHandler, IHandlerParameters, TextUtils } from "@zowe/imperative";
+import { ICommandHandler, IHandlerParameters, ConnectionPropsForSessCfg, TextUtils } from "@zowe/imperative";
 import { runEjesBatch } from "../../api/ejes_batch";
 
 /**
@@ -19,7 +19,8 @@ import { runEjesBatch } from "../../api/ejes_batch";
  */
 export default class DisplayHandler implements ICommandHandler {
     public async process(params: IHandlerParameters): Promise<void> {
-        const profile = params.profiles.get("ejes");
+        const sessCfg = {};
+        const sessCfgWithCreds = await ConnectionPropsForSessCfg.addPropsOrPrompt(sessCfg, params.arguments, { doPrompting: true, parms: params });
         try {
             runEjesBatch(params);
         }

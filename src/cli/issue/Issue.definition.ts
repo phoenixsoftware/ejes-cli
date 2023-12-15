@@ -10,7 +10,7 @@
 
 import { ICommandDefinition } from "@zowe/imperative";
 import { SystemCommandDefinition } from "./system_command/SystemCommand.definition";
-import { SubmitDefinition } from "./Submit/Submit.definition";
+import { SubmitDefinition } from "./submit/Submit.definition";
 
 import { EjesProfile } from "../EjesProfile";
 
